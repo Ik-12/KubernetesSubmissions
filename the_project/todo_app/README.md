@@ -1,4 +1,4 @@
-# Exercise 1.4
+# Exercise 1.5
 
 ## Deploying
 
@@ -6,10 +6,16 @@
 kubectl apply -f manifests/deployment.yaml
 ```
 
+## Do Port Forwarding
+
+```sh
+kubectl port-forward deployment/todo-app-deployment 5555:5000 &
+```
+
 ## Verify output
 
 ```sh
-kubectl logs deployment/todo-app-deployment
+curl http://127.0.0.1:5555
 ```
 
 ## (Re)Building the docker image
