@@ -1,15 +1,15 @@
-# Exercise 1.1
+# Exercise 1.3
 
 ## Deploying
 
 ```sh
-kubectl create deployment log-output --image=iku1/log_output:1.1
+kubectl apply -f manifests/deployment.yaml
 ```
 
 ## Verify output
 
 ```sh
-kubectl logs deployment/log_output --all-pods=true
+kubectl logs deployment/log-output-deployment
 ```
 
 ## (Re)Building the docker image
