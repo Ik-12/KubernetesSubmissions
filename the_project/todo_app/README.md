@@ -1,15 +1,15 @@
-# Exercise 1.2
+# Exercise 1.4
 
 ## Deploying
 
 ```sh
-kubectl create deployment todo_app --image=docker.io/iku1/todo_app:1.2
+kubectl apply -f manifests/deployment.yaml
 ```
 
 ## Verify output
 
 ```sh
-kubectl logs deployment/todo_app --all-pods=true
+kubectl logs deployment/todo-app-deployment
 ```
 
 ## (Re)Building the docker image
