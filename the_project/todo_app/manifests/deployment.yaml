@@ -12,6 +12,18 @@ spec:
       labels:
         app: todo-app
     spec:
+      volumes:
+        - name: img-cache
+          persistentVolumeClaim:
+            claimName: image-cache
+      securityContext:
+        runAsUser: 999
+        runAsGroup: 999
+        fsGroup: 999
       containers:
         - name: todo-app
-          image: docker.io/iku1/todo_app:1.2
+          image: docker.io/iku1/todo_app:1.12
+          imagePullPolicy: Always
+          volumeMounts:
+          - name: img-cache
+            mountPath: /tmp/img-cache
