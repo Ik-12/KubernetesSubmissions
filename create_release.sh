@@ -90,4 +90,7 @@ gh release create "$VERSION" --title "$VERSION" --notes "Release exercise $VERSI
 # Pull the release tag just created
 git pull
 
+echo
 echo "✅ Release $VERSION created and pushed successfully."
+echo "Link to the release:"
+echo "https://github.com/Ik-12/KubernetesSubmissions/tree/$VERSION"
