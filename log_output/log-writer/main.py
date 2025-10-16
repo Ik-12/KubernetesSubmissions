@@ -1,9 +1,10 @@
 import uuid
 import time
+import os
 import datetime
 
-LOG_FILE_PATH = "/tmp/random.log"
-
+LOG_FILE_PATH = os.environ.get('LOG_FILE_PATH', 
+                               "/tmp/log_output/random.log")
 def main():
     log_uuid = str(uuid.uuid4())
 

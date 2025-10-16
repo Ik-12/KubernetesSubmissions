@@ -1,7 +1,8 @@
 import os
 from flask import Flask
 
-LOG_FILE_PATH = "/tmp/random.log"
+LOG_FILE_PATH = os.environ.get('LOG_FILE_PATH', 
+                               "/tmp/log_output/random.log")
 
 app = Flask(__name__)
 
