@@ -1,4 +1,4 @@
-# Exercise 1.6
+# Exercise 1.8
 
 ## Recreate cluster with proper port mapping
 
@@ -19,19 +19,7 @@ kubectl apply -f manifests/
 From localhost:
 
 ```sh
- curl http://127.0.0.1:8082
-```
-
-Inside cluster:
-
-```sh
-docker exec -it k3d-k3s-default-agent-1 wget -qO- http://10.43.127.7:1234
-```
-
-Where `10.43.127.7` is ClusterIP from output of following command:
-
-```sh
-kubectl get svc todo-app-svc
+ curl http://127.0.0.1:8081
 ```
 
 ## (Re)Building the docker image
