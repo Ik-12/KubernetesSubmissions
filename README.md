@@ -14,3 +14,4 @@
 - [1.8](https://github.com/Ik-12/KubernetesSubmissions/tree/1.8/the_project/todo_app)
 - [1.9](https://github.com/Ik-12/KubernetesSubmissions/tree/1.9/ping_pong)
 - [1.10](https://github.com/Ik-12/KubernetesSubmissions/tree/1.10/log_output)
+- [1.11](https://github.com/Ik-12/KubernetesSubmissions/tree/1.11/log_output)
