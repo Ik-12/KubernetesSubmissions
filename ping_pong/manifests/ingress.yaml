@@ -1,15 +1,15 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: log-output-ingress
+  name: ping-pong-ingress
 spec:
   rules:
   - http:
       paths:
-      - path: /log
+      - path: /pingpong
         pathType: Prefix
         backend:
           service:
-            name: log-output-svc
+            name: ping-pong-svc
             port:
-              number: 2345
+              number: 5001
