@@ -1,4 +1,4 @@
-# Exercise 1.10
+# Exercise 1.11
 
 ## Cluster configuration
 
@@ -10,23 +10,39 @@ k3d cluster create -a 2 --k3s-arg "--tls-san=192.168.65.3@server:0" --port 8082:
 
 Note: `--tls-san=192.168.65.3@server:0` is neeed to allow Lens running on local machine to cluster running on VM. ```
 
+### Create directory for persistent storage
+
+```sh
+docker exec k3d-k3s-default-agent-0 mkdir -p /tmp/kube
+```
+
+Fix permission for containers running as non-root user:
+
+```sh
+docker exec k3d-k3s-default-agent-0 chmod 777 /tmp/kube
+```
+
 ## Deploy
 
 ```sh
+kubectl apply -f ../volumes/
 kubectl apply -f manifests/
+kubectl apply -f ../log_output/manifests/
 ```
 
 ## Verify output
 
-`/log` endpoint:
-
 ```sh
 curl http://127.0.0.1:8081/log
+curl http://127.0.0.1:8081/pingpong
+curl http://127.0.0.1:8081/pingpong
+curl http://127.0.0.1:8081/log
+
 ```
 
 ## (Re)Building the docker images
 
 ```sh
-docker build . -t <namespace>/log_output_writer:1.10
-docker build . -t <namespace>/log_output_reader_api:1.10
+docker build ./log-reader-api -t <namespace>/log_output_reader_api:1.11
+docker build ./log-writer -t <namespace>/log_output_writer:1.11
 ```

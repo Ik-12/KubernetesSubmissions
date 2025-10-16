@@ -14,10 +14,15 @@ spec:
     spec:
       volumes:
         - name: shared-logs
-          emptyDir: {}
+          persistentVolumeClaim:
+            claimName: log-volume-claim
+      securityContext:
+        runAsUser: 999
+        runAsGroup: 999
+        fsGroup: 999
       containers:
         - name: log-writer
-          image: docker.io/iku1/log_output_writer:1.10
+          image: docker.io/iku1/log_output_writer:1.11
           imagePullPolicy: Always
           volumeMounts:
           - name: shared-logs
@@ -26,7 +31,7 @@ spec:
             - name: LOG_FILE_PATH
               value: "/tmp/log_output/random.log"
         - name: log-reader-api
-          image: docker.io/iku1/log_output_reader_api:1.10
+          image: docker.io/iku1/log_output_reader_api:1.11
           imagePullPolicy: Always
           volumeMounts:
           - name: shared-logs
@@ -34,5 +39,7 @@ spec:
           env:
             - name: LOG_FILE_PATH
               value: "/tmp/log_output/random.log"
+            - name: PONG_COUNT_FILE_PATH
+              value: "/tmp/log_output/pong_count"
             - name: PORT
               value: "5000"

@@ -12,6 +12,23 @@ spec:
       labels:
         app: ping-pong
     spec:
+      volumes:
+        - name: shared-logs
+          persistentVolumeClaim:
+            claimName: log-volume-claim
+      securityContext:
+        runAsUser: 999
+        runAsGroup: 999
+        fsGroup: 999
       containers:
         - name: ping-pong
-          image: docker.io/iku1/ping_pong:1.9
+          image: docker.io/iku1/ping_pong:1.11
+          imagePullPolicy: Always
+          volumeMounts:
+          - name: shared-logs
+            mountPath: /tmp/pong_log
+          env:
+            - name: LOG_FILE
+              value: /tmp/pong_log/pong_count
+            - name: PORT
+              value: "5001"
