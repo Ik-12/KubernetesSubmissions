@@ -1,4 +1,4 @@
-# Exercise 1.11
+# Exercise 2.3
 
 ## Cluster configuration
 
@@ -10,24 +10,17 @@ k3d cluster create -a 2 --k3s-arg "--tls-san=192.168.65.3@server:0" --port 8082:
 
 Note: `--tls-san=192.168.65.3@server:0` is neeed to allow Lens running on local machine to cluster running on VM. ```
 
-### Create directory for persistent storage
-
-```sh
-docker exec k3d-k3s-default-agent-0 mkdir -p /tmp/kube
-```
-
-Fix permission for containers running as non-root user:
-
-```sh
-docker exec k3d-k3s-default-agent-0 chmod 777 /tmp/kube
-```
-
 ## Deploy
 
+### Move persintent volume claims
+
+Persistent volume claims have a namespace so we must also them to 'exercises' namespace. Easiest option is to delete and recreate them after updating manifests:
+
 ```sh
-kubectl apply -f ../volumes/
-kubectl apply -f manifests/
-kubectl apply -f ../log_output/manifests/
+kubectl ns default
+kubectl delete pvc log-volume-claim
+kubectl delete delete pv mooc-pv
+kubectl apply -f ../volumes/ # namespace is defined in manifest
 ```
 
 ## Verify output
