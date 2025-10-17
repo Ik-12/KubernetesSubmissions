@@ -21,4 +21,4 @@
 ## Chapter 3
 
 - [2.1](https://github.com/Ik-12/KubernetesSubmissions/tree/2.1/log_output)
-
+- [2.2](https://github.com/Ik-12/KubernetesSubmissions/tree/2.2/the_project/todo_app)
