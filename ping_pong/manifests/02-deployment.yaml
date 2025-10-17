@@ -23,13 +23,13 @@ spec:
         fsGroup: 999
       containers:
         - name: ping-pong
-          image: docker.io/iku1/ping_pong:2.1
+          image: docker.io/iku1/ping_pong:2.7
           imagePullPolicy: Always
           volumeMounts:
           - name: shared-logs
             mountPath: /tmp/pong_log
           env:
-            - name: LOG_FILE
-              value: /tmp/pong_log/pong_count
+            - name: POSTGRES_URL
+              value: "postgresql://postgres@postgres-svc"
             - name: PORT
               value: "5001"

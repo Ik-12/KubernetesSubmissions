@@ -1,4 +1,4 @@
-# Exercise 2.1
+# Exercise 2.7
 
 ## Cluster configuration
 
@@ -19,12 +19,14 @@ kubectl apply -f manifests/
 ## Verify output
 
 ```sh
-kubectl apply -f ../../curlpod.yaml
-kubectl exec -it curlpod -- curl http://ping-pong-svc:5001/pings
+curl http://192.168.65.3:8081/pingpong
+curl http://192.168.65.3:8081/pingpong
+curl http://192.168.65.3:8081/pingpong
+kubectl exec -it postgres-stset-0 -- su postgres -c pg_dump | egrep '^COPY public.pong_counter' -A 1
 ```
 
 ## (Re)Building the docker image
 
 ```sh
-docker build . -t <namespace>/ping_pong:2.1
+docker build . -t <namespace>/ping_pong:2.7
 ```

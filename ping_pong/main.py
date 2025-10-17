@@ -1,46 +1,61 @@
-from flask import Flask
+from flask import Flask, jsonify
 import os
 import logging
+import psycopg2
+
+POSTGRES_URL = os.environ.get('POSTGRES_URL', 'postgresql://postgres@localhost')
 
 class PingPongApp:
     def __init__(self):
         self.port = int(os.environ.get('PORT', 5001))
-        
-        # Set up logging pong count
-        self.pong_count = 0
-        self.log_file = os.environ.get('PONG_COUNT_FILE_PATH', 
-                                       '/tmp/pong_log/pong_count')
-        os.makedirs(os.path.dirname(self.log_file), exist_ok=True)
-        self.write_pong_count()
 
+        self.conn = self.init_db()
         self.flask_app = Flask(__name__)
         self.setup_routes()
+
+    def init_db(self):
+        conn = psycopg2.connect(POSTGRES_URL)
+        with conn.cursor() as cur:
+            cur.execute("""
+                CREATE TABLE IF NOT EXISTS pong_counter (
+                    id SERIAL PRIMARY KEY,
+                    pong_count INTEGER NOT NULL
+                );
+            """)
+            # Ensure a single row exists
+            cur.execute("SELECT pong_count FROM pong_counter WHERE id=1;")
+            if cur.fetchone() is None:
+                cur.execute("INSERT INTO pong_counter (id, pong_count) VALUES (1, 0);")
+            conn.commit()
+        return conn
+
+    def get_pong_count(self):
+        with self.conn.cursor() as cur:
+            cur.execute("SELECT pong_count FROM pong_counter WHERE id=1;")
+            row = cur.fetchone()
+            return row[0] if row else 0
+
+    def increment_pong_count(self):
+        with self.conn.cursor() as cur:
+            cur.execute("UPDATE pong_counter SET pong_count = pong_count + 1 WHERE id=1;")
+            self.conn.commit()
 
     def setup_routes(self):
         @self.flask_app.route('/pingpong')
         def pong():
-            resp = f"pong {self.pong_count}"
-            self.write_pong_count()
-                
-            self.pong_count += 1
-                
+            count = self.get_pong_count()
+            resp = f"pong {count}"
+            self.increment_pong_count()
             return resp
 
         @self.flask_app.route('/pings')
         def pings():
-            return {'pong_count': self.pong_count}
-
-    def write_pong_count(self):
-        try:
-            with open(self.log_file, "w") as f:
-                f.write(str(self.pong_count))
-        except Exception as e:
-            self.flask_app.logger.error(f"Error writing pong count: {e}")
+            count = self.get_pong_count()
+            return jsonify({'pong_count': count})
 
     def run(self):
         self.flask_app.logger.info(f"Server started in port {self.port}")
-        self.flask_app.logger.info(f"Pong count file path: {self.log_file}")
-        
+        self.flask_app.logger.info(f"Using Postgres at: {POSTGRES_URL}")
         self.flask_app.run(host='0.0.0.0', port=self.port)
 
 ping_pong_app = PingPongApp()
