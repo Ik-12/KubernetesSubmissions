@@ -1,4 +1,4 @@
-# Exercise 2.3
+# Exercise 2.5
 
 ## Cluster configuration
 
@@ -12,30 +12,18 @@ Note: `--tls-san=192.168.65.3@server:0` is neeed to allow Lens running on local 
 
 ## Deploy
 
-### Move persintent volume claims
-
-Persistent volume claims have a namespace so we must also them to 'exercises' namespace. Easiest option is to delete and recreate them after updating manifests:
-
 ```sh
-kubectl ns default
-kubectl delete pvc log-volume-claim
-kubectl delete delete pv mooc-pv
-kubectl apply -f ../volumes/ # namespace is defined in manifest
+kubectl apply -f manifests/
 ```
 
 ## Verify output
 
 ```sh
-curl http://127.0.0.1:8081/log
-curl http://127.0.0.1:8081/pingpong
-curl http://127.0.0.1:8081/pingpong
-curl http://127.0.0.1:8081/log
-
+curl -s http://192.168.65.3:8081/log | head
 ```
 
 ## (Re)Building the docker images
 
 ```sh
-docker build ./log-reader-api -t <namespace>/log_output_reader_api:1.11
-docker build ./log-writer -t <namespace>/log_output_writer:1.11
+docker build ./log-reader-api -t <namespace>/log_output_reader_api:2.5
 ```
