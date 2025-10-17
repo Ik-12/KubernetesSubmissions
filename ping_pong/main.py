@@ -25,7 +25,11 @@ class PingPongApp:
             self.pong_count += 1
                 
             return resp
-        
+
+        @self.flask_app.route('/pings')
+        def pings():
+            return {'pong_count': self.pong_count}
+
     def write_pong_count(self):
         try:
             with open(self.log_file, "w") as f:
