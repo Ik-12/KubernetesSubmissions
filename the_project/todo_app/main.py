@@ -17,21 +17,40 @@ class TodoApp:
         
         self.image_lock = threading.Lock()
         self.start_image_updater()
+        
+        self.todos = ["Clean the house", "Write code", "Read a book"]
 
     def setup_routes(self):
-        @self.flask_app.route('/')
+        @self.flask_app.route('/', methods=['GET', 'POST'])
         def home():
-            # Display the image on the webpage
+            from flask import request, redirect, url_for
+            if request.method == 'POST':
+                todo_text = request.form.get('todo')
+                if todo_text:
+                    self.todos.append(todo_text)
+                return redirect(url_for('home'))
+
+            # Display the image and todo form
             html = """
             <html>
             <body>
                 <h2>The ToDo App</h2>
-                <img src="/image" width="800"/>
+                <img src="/image" width="400"/>
                 <p>DevOps with Kubernetes 2025</p>
+                <form method="post">
+                    <input type="text" name="todo" placeholder="Enter todo item" required>
+                    <input type="submit" value="Add">
+                </form>
+                <h3>Todo Items:</h3>
+                <ul>
+                    {% for item in todos %}
+                        <li>{{ item }}</li>
+                    {% endfor %}
+                </ul>
             </body>
             </html>
             """
-            return render_template_string(html)
+            return render_template_string(html, todos=self.todos)
 
         @self.flask_app.route('/image')
         def image():
