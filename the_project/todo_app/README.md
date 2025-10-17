@@ -1,4 +1,4 @@
-# Exercise 1.12
+# Exercise 1.13
 
 ## Recreate cluster with proper port mapping
 
@@ -11,24 +11,19 @@ Note: `--tls-san=192.168.65.3@server:0` is neeed to allow Lens running on local 
 ## Deploying
 
 ```sh
-kubectl apply -f ../../volumes/persistent_cache.yml
-kubectl apply -f ../../volumes/persistent_imgcache_claim.yaml
 kubectl apply -f manifests/
 ```
 
 ## Verify output
 
-Open http://127.0.0.1:8081 in browser (or using the VM ip address).
-
-Restarts and check that image didn't change:
+Open http://127.0.0.1:8081 in browser (or using the VM ip address), or to see just the hardcoded list:
 
 ```sh
-kubectl delete deployments.apps todo-app-deployment
-kubectl apply -f manifests/
+curl http://127.0.0.1:8081/
 ```
 
 ## (Re)Building the docker image
 
 ```sh
-docker build . -t <namespace>/todo_app:1.12
+docker build . -t <namespace>/todo_app:1.13
 ```
