@@ -1,4 +1,4 @@
-# Exercise 1.13
+# Exercise 2.2
 
 ## Recreate cluster with proper port mapping
 
@@ -11,19 +11,16 @@ Note: `--tls-san=192.168.65.3@server:0` is neeed to allow Lens running on local 
 ## Deploying
 
 ```sh
+kubectl apply -f ../todo_backend/manifests/
 kubectl apply -f manifests/
 ```
 
 ## Verify output
 
-Open http://127.0.0.1:8081 in browser (or using the VM ip address), or to see just the hardcoded list:
-
-```sh
-curl http://127.0.0.1:8081/
-```
+Open http://127.0.0.1:8081 in browser (or using the VM ip address).
 
 ## (Re)Building the docker image
 
 ```sh
-docker build . -t <namespace>/todo_app:1.13
+docker build . -t <namespace>/todo_app:2.2
 ```

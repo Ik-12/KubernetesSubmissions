@@ -1,9 +1,12 @@
-from flask import Flask, send_file, render_template_string
+from flask import Flask, redirect, send_file, render_template_string
 import os
 import logging
 import requests
 import threading
 import time
+
+BACKEND_URL = os.environ.get('TODO_BACKEND_URL', 
+                             'http://localhost:5005')
 
 IMAGE_URL = "https://picsum.photos/1200"
 IMAGE_CACHE_PATH = "/tmp/img-cache/cached_image.jpg"
@@ -18,18 +21,18 @@ class TodoApp:
         self.image_lock = threading.Lock()
         self.start_image_updater()
         
-        self.todos = ["Clean the house", "Write code", "Read a book"]
-
     def setup_routes(self):
-        @self.flask_app.route('/', methods=['GET', 'POST'])
+        # @self.flask_app.route('/todos', methods=['POST'])
+        # def todos():
+        #     return self.flask_app.redirect(BACKEND_URL + '/todos', code=307)       
+        
+        @self.flask_app.route('/', methods=['GET'])
         def home():
-            from flask import request, redirect, url_for
-            if request.method == 'POST':
-                todo_text = request.form.get('todo')
-                if todo_text:
-                    self.todos.append(todo_text)
-                return redirect(url_for('home'))
-
+            todos = requests.get(BACKEND_URL + '/todos') \
+                .json().get('todos', [])
+                
+            self.flask_app.logger.info("GET Fetched todos from backend: %s", todos)
+            
             # Display the image and todo form
             html = """
             <html>
@@ -37,7 +40,7 @@ class TodoApp:
                 <h2>The ToDo App</h2>
                 <img src="/image" width="400"/>
                 <p>DevOps with Kubernetes 2025</p>
-                <form method="post">
+                <form method="post" action="/todos">
                     <input type="text" name="todo" placeholder="Enter todo item" required>
                     <input type="submit" value="Add">
                 </form>
@@ -50,7 +53,7 @@ class TodoApp:
             </body>
             </html>
             """
-            return render_template_string(html, todos=self.todos)
+            return render_template_string(html, todos=todos)
 
         @self.flask_app.route('/image')
         def image():

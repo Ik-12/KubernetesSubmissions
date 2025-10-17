@@ -22,8 +22,11 @@ spec:
         fsGroup: 999
       containers:
         - name: todo-app
-          image: docker.io/iku1/todo_app:1.13
+          image: docker.io/iku1/todo_app:2.2
           imagePullPolicy: Always
           volumeMounts:
           - name: img-cache
             mountPath: /tmp/img-cache
+          env:
+            - name: TODO_BACKEND_URL
+              value: "http://todo-backend-svc:2000"
