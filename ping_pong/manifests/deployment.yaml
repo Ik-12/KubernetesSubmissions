@@ -22,7 +22,7 @@ spec:
         fsGroup: 999
       containers:
         - name: ping-pong
-          image: docker.io/iku1/ping_pong:1.11
+          image: docker.io/iku1/ping_pong:2.1
           imagePullPolicy: Always
           volumeMounts:
           - name: shared-logs
