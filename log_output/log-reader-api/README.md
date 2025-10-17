@@ -1,4 +1,4 @@
-# Exercise 1.8
+# Exercise 2.1
 
 ## Cluster configuration
 
@@ -16,13 +16,7 @@ Note: `--tls-san=192.168.65.3@server:0` is neeed to allow Lens running on local 
 kubectl apply -f manifests/
 ```
 
-## Verify 
-
-Logging:
-
-```sh
-kubectl logs deployment/log-output-deployment
-```
+## Verify
 
 `/log` endpoint:
 
@@ -33,5 +27,5 @@ curl http://127.0.0.1:8081/log
 ## (Re)Building the docker image
 
 ```sh
-docker build . -t <namespace>/log_output:1.7
+docker build . -t <namespace>/log_output_reader_api:2.1
 ```
