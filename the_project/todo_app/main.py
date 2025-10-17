@@ -22,10 +22,6 @@ class TodoApp:
         self.start_image_updater()
         
     def setup_routes(self):
-        # @self.flask_app.route('/todos', methods=['POST'])
-        # def todos():
-        #     return self.flask_app.redirect(BACKEND_URL + '/todos', code=307)       
-        
         @self.flask_app.route('/', methods=['GET'])
         def home():
             todos = requests.get(BACKEND_URL + '/todos') \
@@ -47,7 +43,7 @@ class TodoApp:
                 <h3>Todo Items:</h3>
                 <ul>
                     {% for item in todos %}
-                        <li>{{ item }}</li>
+                        <li>{{ item["name"] }}</li>
                     {% endfor %}
                 </ul>
             </body>

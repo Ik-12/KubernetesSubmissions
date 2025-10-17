@@ -19,8 +19,10 @@ spec:
         fsGroup: 999
       containers:
         - name: todo-backend
-          image: docker.io/iku1/todo_backend:2.2
+          image: docker.io/iku1/todo_backend:2.8
           imagePullPolicy: Always
           env:
             - name: PORT
               value: "5005"
+            - name: POSTGRES_URL
+              value: "postgresql://postgres@postgres-svc"
