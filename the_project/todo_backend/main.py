@@ -45,15 +45,22 @@ class TodoBackend:
         def todo():
             if request.method == 'POST':
                 todo_text = request.form.get('todo')
-                
                 if not todo_text and request.is_json and request.json is not None:
                     todo_text = request.json.get('todo')
-                    
-                if todo_text:
-                    todo_id = self.add_todo(todo_text)
-                    return redirect("/")
-                
-                return jsonify({"error": "Missing todo"}), 400
+
+                if not todo_text:
+                    self.flask_app.logger.warning("Missing todo text in request")
+                    return jsonify({"error": "Missing todo"}), 400
+
+                if len(todo_text) > 140:
+                    self.flask_app.logger.warning(f"Failed to add todo item {repr(todo_text)}. \
+                                                  Length exceeds limit of 140 characters")
+                    return jsonify({"error": "Todo must be 140 characters or less"}), 400
+
+                todo_id = self.add_todo(todo_text)
+                self.flask_app.logger.info(f"Added todo item {repr(todo_text)} with id {todo_id}")
+                return redirect("/")
+
             elif request.method == 'GET':
                 return jsonify({"todos": self.get_todos()})
             else:
