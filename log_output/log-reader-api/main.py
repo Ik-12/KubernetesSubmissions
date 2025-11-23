@@ -49,6 +49,12 @@ def get_log_string():
 def log_endpoint():
     return get_log_string()
 
+
+@app.route("/")
+def root():
+    return "OK", 200
+
+
 if __name__ == "__main__":
     app.logger.info("Starting log reader API")
     app.logger.info("Log file path: %s", LOG_FILE_PATH)
