@@ -21,7 +21,7 @@ to originals used for local deployment.
 
 ```
 k apply -f gke/manifests/
-k get ing # Note 'ADDRESS' for ping-pong-ingress
+k get gateway # Note 'ADDRESS' for ping-pong-gateway
 ```
 
 Verify that app is working:

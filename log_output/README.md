@@ -21,7 +21,7 @@ to originals used for local deployment.
 
 ```
 k apply -f gke/manifests/
-k get ing # Note 'ADDRESS' for log-output-ingress
+k get gateway # Note 'ADDRESS' for log-output-gateway
 ```
 
 Verify that getting logs works:
