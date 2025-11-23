@@ -68,10 +68,11 @@ fi
 
 # Clean up trailing blank lines in README
 # Remove all empty lines at the end of the file
-sed -i '${/^$/d;}' "$README_FILE"
+sed -i '.bak' '${/^$/d;}' "$README_FILE"
 while [[ -z $(tail -n1 "$README_FILE") ]]; do
-  sed -i '${/^$/d;}' "$README_FILE"
+  sed -i '.bak' '${/^$/d;}' "$README_FILE"
 done
+rm "$README_FILE".bak
 
 # Append new link
 echo "$LINK" >> "$README_FILE"
