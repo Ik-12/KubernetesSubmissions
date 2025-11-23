@@ -95,3 +95,4 @@ echo
 echo "✅ Release $VERSION created and pushed successfully."
 echo "Link to the release:"
 echo "https://github.com/Ik-12/KubernetesSubmissions/tree/$VERSION"
+echo "https://github.com/Ik-12/KubernetesSubmissions/tree/$VERSION" | pbcopy
