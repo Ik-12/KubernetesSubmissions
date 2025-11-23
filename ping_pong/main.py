@@ -44,7 +44,7 @@ class PingPongApp:
             self.conn.commit()
 
     def setup_routes(self):
-        @self.flask_app.route("/pingpong")
+        @self.flask_app.route("/")
         def pong():
             count = self.get_pong_count()
             resp = f"pong {count}"
@@ -55,10 +55,6 @@ class PingPongApp:
         def pings():
             count = self.get_pong_count()
             return jsonify({"pong_count": count})
-
-        @self.flask_app.route("/")
-        def root():
-            return "OK", 200
 
     def run(self):
         self.flask_app.logger.info(f"Server started in port {self.port}")
