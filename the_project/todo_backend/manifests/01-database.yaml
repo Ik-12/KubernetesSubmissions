@@ -23,9 +23,9 @@ spec:
           volumeMounts:
             - name: postgres-data-storage
               mountPath: /data
-          env:
-            - name: POSTGRES_HOST_AUTH_METHOD
-              value: "trust"
+          envFrom:
+            - secretRef:
+                name: pg-password
   volumeClaimTemplates:
     - metadata:
         name: postgres-data-storage

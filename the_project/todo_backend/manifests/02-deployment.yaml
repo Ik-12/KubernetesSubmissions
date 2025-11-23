@@ -21,8 +21,11 @@ spec:
         - name: todo-backend
           image: docker.io/iku1/todo_backend:2.10
           imagePullPolicy: Always
+          envFrom: # Load POSTGRES_PASSWORD
+            - secretRef:
+                name: pg-password
           env:
             - name: PORT
               value: "5005"
             - name: POSTGRES_URL
-              value: "postgresql://postgres@postgres-svc"
+              value: "postgresql://postgres:$(POSTGRES_PASSWORD)@postgres-svc"
