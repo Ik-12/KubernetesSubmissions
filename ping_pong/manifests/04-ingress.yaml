@@ -13,4 +13,4 @@ spec:
           service:
             name: ping-pong-svc
             port:
-              number: 5001
+              number: 80

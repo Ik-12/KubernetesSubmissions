@@ -1,6 +1,38 @@
-# Exercise 2.5
+# Exercise 3.2
 
-## Cluster configuration
+## Google Kubernetes Engine Configuration
+
+If GKE cluster is not alread running, create it:
+
+```
+gcloud auth login
+gcloud config set project dwk-gke-iku
+gcloud services enable container.googleapis.com
+gcloud container clusters create dwk-cluster --zone=europe-north1-b --cluster-version=1.32 --gateway-api=standard --disk-size=32 --num-nodes=3 --machine-type=e2-medium
+gcloud components install gke-gcloud-auth-plugin
+gcloud container clusters get-credentials dwk-cluster --location=europe-north1-b
+
+```
+
+## Deploy to GKE
+
+GKE specific manifests are stored in `gke/manifests/`. Unmodified ones are just symlinks
+to originals used for local deployment.
+
+```
+k apply -f gke/manifests/
+k get ing # Note 'ADDRESS' for log-output-ingress
+```
+
+Verify that getting logs works:
+
+```
+curl http://<address>/log
+```
+
+Note that ping/pong count will not work if pingpong app is not already running.
+
+## Local Cluster Configuration
 
 Make sure the cluster has required port mapping for docker:
 

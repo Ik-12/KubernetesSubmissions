@@ -21,14 +21,13 @@ to originals used for local deployment.
 
 ```
 k apply -f gke/manifests/
-k get svc --watch # Note 'EXTERNAL-IP' for ping-pong-svc
-
+k get ing # Note 'ADDRESS' for ping-pong-ingress
 ```
 
 Verify that app is working:
 
 ```
-curl http://<external-ip>/pingpong
+curl http://<addressp>/pingpong
 ```
 
 ## Local Cluster Configuration

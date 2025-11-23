@@ -31,20 +31,22 @@ spec:
         fsGroup: 999
       containers:
         - name: log-writer
-          image: docker.io/iku1/log_output_writer:1.11
+          image: docker.io/iku1/log_output_writer:3.2
           imagePullPolicy: Always
           volumeMounts:
           - name: shared-logs
             mountPath: /tmp/log_output
+            subPath: logs
           env:
             - name: LOG_FILE_PATH
               value: "/tmp/log_output/random.log"
         - name: log-reader-api
-          image: docker.io/iku1/log_output_reader_api:2.5
+          image: docker.io/iku1/log_output_reader_api:3.2
           imagePullPolicy: Always
           volumeMounts:
           - name: shared-logs
             mountPath: /tmp/log_output
+            subPath: logs
           - name: config
             mountPath: "/config"
             readOnly: true
@@ -54,7 +56,7 @@ spec:
             - name: INFO_FILE_PATH
               value: "/config/information.txt"
             - name: PONG_COUNT_SERVICE_URL
-              value: "http://ping-pong-svc:5001/pings"
+              value: "http://ping-pong-svc:80/pings"
             - name: PORT
               value: "5000"
             - name: MESSAGE # ENV name passed to container
