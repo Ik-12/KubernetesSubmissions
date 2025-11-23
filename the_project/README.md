@@ -16,6 +16,7 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: pg-password
+  namespace: project
 data:
   POSTGRESS_PASSWORD: <base64-encode-password-from-step-1>
 ```
