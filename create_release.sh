@@ -47,7 +47,7 @@ if ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+$ ]]; then
 fi
 
 # Find README (assume it's named README.md)
-README_FILE="/home/debian/KubernetesSubmissions/README.md"
+README_FILE="$(git rev-parse --show-toplevel)/README.md"
 if [[ ! -f "$README_FILE" ]]; then
   echo "Error: $README_FILE not found in current directory."
   exit 1
