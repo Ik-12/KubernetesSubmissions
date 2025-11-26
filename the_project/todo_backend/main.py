@@ -41,6 +41,10 @@ class TodoBackend:
             return [{"id": r[0], "name": r[1], "done": r[2]} for r in rows]
 
     def setup_routes(self):
+        @self.flask_app.route("/")
+        def root():
+            return "OK", 200
+        
         @self.flask_app.route('/todos', methods=['GET', 'POST'])
         def todo():
             if request.method == 'POST':
