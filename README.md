@@ -37,3 +37,4 @@
 - [3.2](https://github.com/Ik-12/KubernetesSubmissions/tree/3.2/log_output)
 - [3.3](https://github.com/Ik-12/KubernetesSubmissions/tree/3.3/ping_pong)
 - [3.4](https://github.com/Ik-12/KubernetesSubmissions/tree/3.4/ping_pong)
+- [3.5](https://github.com/Ik-12/KubernetesSubmissions/tree/3.5/the_project)
