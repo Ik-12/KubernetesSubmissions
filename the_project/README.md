@@ -1,4 +1,4 @@
-# Exercise 2.8
+# Exercise 3.5
 
 ## Namespace configuration
 
@@ -49,7 +49,13 @@ kubectl apply -f ../volumes/persistent_imgcache_claim.yaml
 export SOPS_AGE_KEY_FILE=~/key.txt
 sops --decrypt manifests/secret.enc.yaml | kubectl apply -f -
 
-### Deploy
+### Deploy to GKE
+
+```
+k --load-restrictor LoadRestrictionsNone kustomize gke/manifests/ | kubectl apply -f -
+```
+
+### Deploy in local cluster
 
 ```sh
 kubectl apply -f todo_backend/manifests/

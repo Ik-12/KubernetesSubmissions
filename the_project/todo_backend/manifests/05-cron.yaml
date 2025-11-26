@@ -20,5 +20,5 @@ spec:
               export URL=$(curl -Ls -o /dev/null -w '%{url_effective}' https://en.wikipedia.org/wiki/Special:Random)
               curl -X POST -H 'Content-Type: application/json' \
               -d "{\"todo\": \"Read about $URL\"}" \
-              http://todo-backend-svc:2000/todos
+              http://todo-backend-svc:80/todos
           restartPolicy: OnFailure
