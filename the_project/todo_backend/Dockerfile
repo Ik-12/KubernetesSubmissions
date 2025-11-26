@@ -29,6 +29,8 @@ FROM python:${PYTHON_VERSION}-slim-trixie
 ARG PORT=5000
 ENV PORT=$PORT
 
+ENV GUNICORN_OPTIONS=""
+
 # Setup a non-root user
 RUN groupadd --system --gid 999 nonroot \
  && useradd --system --gid 999 --uid 999 --create-home nonroot
@@ -46,4 +48,4 @@ USER nonroot
 WORKDIR /app
 
 # Server the app using Gunicorn with 1 workers
-CMD gunicorn -w 1 -b 0.0.0.0:$PORT main:flask_app
+CMD gunicorn -w 1 -b 0.0.0.0:$PORT $GUNICORN_OPTIONS main:flask_app

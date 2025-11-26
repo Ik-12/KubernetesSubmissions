@@ -23,7 +23,7 @@ spec:
         fsGroup: 999
       containers:
         - name: todo-app
-          image: docker.io/iku1/todo_app:2.8
+          image: docker.io/iku1/todo_app:3.5.1
           imagePullPolicy: Always
           volumeMounts:
           - name: img-cache
@@ -32,4 +32,6 @@ spec:
             - name: PORT
               value: "5000"
             - name: TODO_BACKEND_URL
-              value: "http://todo-backend-svc:2000"
+              value: "http://todo-backend-svc:2000"              value: "http://todo-backend-svc:80"
+            - name: GUNICORN_OPTIONS
+              value: "--log-level=debug --access-logfile - --disable-redirect-access-to-syslog"

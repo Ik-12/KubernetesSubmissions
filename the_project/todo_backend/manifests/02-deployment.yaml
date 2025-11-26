@@ -19,7 +19,7 @@ spec:
         fsGroup: 999
       containers:
         - name: todo-backend
-          image: docker.io/iku1/todo_backend:2.10
+          image: docker.io/iku1/todo_backend:3.5.3
           imagePullPolicy: Always
           envFrom: # Load POSTGRES_PASSWORD
             - secretRef:
@@ -29,3 +29,5 @@ spec:
               value: "5005"
             - name: POSTGRES_URL
               value: "postgresql://postgres:$(POSTGRES_PASSWORD)@postgres-svc"
+            - name: GUNICORN_OPTIONS
+              value: "--log-level=debug --access-logfile - --disable-redirect-access-to-syslog"
