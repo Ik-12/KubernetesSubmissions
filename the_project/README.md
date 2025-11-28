@@ -46,7 +46,7 @@ kubectl apply -f ../volumes/persistent_imgcache_claim.yaml
 
 ### Decrypt secrets
 
-export SOPS_AGE_KEY_FILE=~/key.txt
+export SOPS_AGE_KEY_FILE=$HOME/key.txt
 sops --decrypt manifests/secret.enc.yaml | kubectl apply -f -
 
 ### Deploy to GKE
