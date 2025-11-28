@@ -95,6 +95,10 @@ jobs:
           kubectl config set-context --current --namespace=${{ env.NAMESPACE }}
           kustomize edit set namespace ${{ env.NAMESPACE }}
 
+          # Create secrets
+          kubectl delete secret pg-password || true
+          kubectl create secret generic pg-password --from-literal=POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} -n testing
+
           # Use the images we just build and pushed
           kustomize edit set image todo_app:\*=$TODO_APP_IMAGE_TAG
           kustomize edit set image todo_backend:\*=$TODO_BACKEND_IMAGE_TAG
