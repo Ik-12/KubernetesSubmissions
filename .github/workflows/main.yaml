@@ -89,8 +89,14 @@ jobs:
       - name: Deploy
         working-directory: the_project/gke/manifests
         run: |-
+          # Set namespace based on branch name
+          kubectl create namespace ${{ env.NAMESPACE }} || true
+          kubectl config set-context --current --namespace=${{ env.NAMESPACE }}
+          kustomize edit set namespace ${{ env.NAMESPACE }}
+
+          # Use the images we just build and pushed
           kustomize edit set image todo_app:\*=$TODO_APP_IMAGE_TAG
           kustomize edit set image todo_backend:\*=$TODO_BACKEND_IMAGE_TAG
+
           kustomize --load-restrictor LoadRestrictionsNone build . | kubectl apply -f -
-          #kubectl rollout status deployment $SERVICE
           kubectl get services -o wide -n project
