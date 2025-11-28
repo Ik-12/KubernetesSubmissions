@@ -80,10 +80,12 @@ echo "$LINK" >> "$README_FILE"
 # Open README in vi for manual review
 vi "$README_FILE"
 
-# Commit and push
-git add "$README_FILE"
-git commit -m "Update README for $VERSION"
-git push
+# Commit and push if any changes
+if [[ `git status --porcelain` ]]; then
+    git add "$README_FILE"
+    git commit -m "Update README for $VERSION"
+    git push
+fi
 
 # Create GitHub release
 gh release create "$VERSION" --title "$VERSION" --notes "Release exercise $VERSION"
