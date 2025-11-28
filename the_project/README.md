@@ -1,4 +1,18 @@
-# Exercise 3.7
+# Exercise 3.9
+
+## DBaaS vs DIY
+
+| Aspect | DBaaS (e.g., Google Cloud SQL) | DIY (e.g., Postgres SQL in GKE) |
+| :---         |     :---      |          :--- |
+| Easy of use     | Easy to set up, no low-level DB knowledge and expertice required.       | Set up requires knowledge of implementation details and must be documented well.      |
+| Costs        | Pure service costs may be higher, but the total cost of ownership can be lower due to lower maintenance costs and better productivity.     | Service costs can be optimized by selecting the cheapest VM provider. |
+| Maintenance     | Requires little or no maintanance.        | The user must maintain the instance(s) and handle updates.  |
+| Backups     | Automatic and production-proven backups.       | The user must handle backups: higher risk of losing data due to bad backup practices.     |
+| Scaling     | Flexible and automatic scaling | Requires more manual control and may be limited.      |
+| Security     | High-level security and compliance handled by security experts      | Handle by the user and thus more prone to poor decisions and user error if      |
+| Flexibility     | Can result in vendor-locking       | Generally unlimited      |
+
+In general, DBaaS is generally safer choice to start with. 
 
 ## Namespace configuration
 
