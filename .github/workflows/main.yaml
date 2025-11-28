@@ -3,7 +3,7 @@ name: Release the Project
 on:
   push:
     branches:
-      - master
+      - "**"
 
 env:
   PROJECT_ID: ${{ secrets.GKE_PROJECT }}
@@ -22,6 +22,16 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Set Kubernetes namespace to use
+        run: |
+          if [ "$BRANCH" = "master" ]; then
+            NAMESPACE="project"
+          else
+            NAMESPACE="$(echo $BRANCH)"
+          fi
+
+          echo "NAMESPACE=$NAMESPACE" | tee "$GITHUB_ENV"
 
       - uses: google-github-actions/auth@v2
         with:
