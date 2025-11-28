@@ -13,7 +13,7 @@ spec:
             value: /todos
       backendRefs:
         - name: todo-backend-svc
-          namespace: project
+          #namespace: project
           port: 80
     - matches:
         - path:
@@ -21,5 +21,5 @@ spec:
             value: /
       backendRefs:
         - name: todo-app-svc
-          namespace: project
+          #namespace: project
           port: 80
