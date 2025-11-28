@@ -46,14 +46,16 @@ kubectl apply -f ../volumes/persistent_imgcache_claim.yaml
 
 ### Decrypt secrets
 
+```
 export SOPS_AGE_KEY_FILE=$HOME/key.txt
 sops --decrypt manifests/secret.enc.yaml | kubectl apply -f -
+```
 
 ### Build, push and deploy using Github Actions
 
 1. Make sure the cluster exists
-2. Create secrets 
-3. Push to GitHub 
+2. Create secrets
+3. Push to GitHub
 
 Actions will automatically build the docker image, push the to GKE
 artifact repo and deploy app by applying the manifests.
