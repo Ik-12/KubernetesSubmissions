@@ -1,4 +1,4 @@
-name: Release the Project
+name: Delete GKE namespace when corresponding branch is deleted
 
 on:
   delete:
