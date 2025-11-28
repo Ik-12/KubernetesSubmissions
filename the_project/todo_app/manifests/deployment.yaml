@@ -4,6 +4,8 @@ metadata:
   name: todo-app-deployment
   namespace: project
 spec:
+  strategy:
+    type: Recreate
   replicas: 1
   selector:
     matchLabels:
@@ -26,8 +28,8 @@ spec:
           image: docker.io/iku1/todo_app:3.5.1
           imagePullPolicy: Always
           volumeMounts:
-          - name: img-cache
-            mountPath: /tmp/img-cache
+            - name: img-cache
+              mountPath: /tmp/img-cache
           env:
             - name: PORT
               value: "5000"
