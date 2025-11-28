@@ -1,4 +1,4 @@
-# Exercise 3.6
+# Exercise 3.7
 
 ## Namespace configuration
 
@@ -44,12 +44,14 @@ kubectl apply -f ../volumes/persistent_imgcache_claim.yaml
 
 ## Update deployments
 
-### Decrypt secrets
+### Decrypt secrets (only for local deployments)
 
 ```
 export SOPS_AGE_KEY_FILE=$HOME/key.txt
 sops --decrypt manifests/secret.enc.yaml | kubectl apply -f -
 ```
+
+When deploying from GitHub Actions, Kubernetes secrets are automatically created from repo secrets.
 
 ### Build, push and deploy using Github Actions
 
@@ -58,7 +60,7 @@ sops --decrypt manifests/secret.enc.yaml | kubectl apply -f -
 3. Push to GitHub
 
 Actions will automatically build the docker image, push the to GKE
-artifact repo and deploy app by applying the manifests.
+artifact repo and deploy app to a namespace corresponding to git branch name (or 'project' if 'master') by applying the manifests.
 
 ### Build, push and deploy using a local runner with Act
 
@@ -68,7 +70,7 @@ artifact repo and deploy app by applying the manifests.
 ```
 act --container-architecture linux/amd64 --var ACTIONS_RUNNER_DEBUG=true -s
 GKE_PROJECT=<redacted> -s GKE_SA_KEY=(cat ~/.secrets/gke-sa-key.json | base64) -s
-GITHUB_TOKEN=<redacted>
+GITHUB_TOKEN=<redacted> -s POSTGRESS_PASSWORD=<redacted>
 ```
 
 ### Deploy to GKE manually
