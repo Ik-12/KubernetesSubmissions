@@ -97,7 +97,7 @@ jobs:
 
           # Create secrets
           kubectl delete secret pg-password || true
-          kubectl create secret generic pg-password --from-literal=POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} -n testing
+          kubectl create secret generic pg-password --from-literal=POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
 
           # Use the images we just build and pushed
           kustomize edit set image todo_app:\*=$TODO_APP_IMAGE_TAG
