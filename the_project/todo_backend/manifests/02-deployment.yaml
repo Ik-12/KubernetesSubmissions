@@ -33,3 +33,10 @@ spec:
               value: "postgresql://postgres:$(POSTGRES_PASSWORD)@postgres-svc"
             - name: GUNICORN_OPTIONS
               value: "--log-level=debug --access-logfile - --disable-redirect-access-to-syslog"
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "250m"
+            limits:
+              memory: "128Mi"
+              cpu: "500m"

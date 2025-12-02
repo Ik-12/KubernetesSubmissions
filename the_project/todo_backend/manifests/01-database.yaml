@@ -26,6 +26,13 @@ spec:
           envFrom:
             - secretRef:
                 name: pg-password
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "250m"
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
   volumeClaimTemplates:
     - metadata:
         name: postgres-data-storage
@@ -45,8 +52,8 @@ metadata:
     app: postgres
 spec:
   ports:
-  - port: 5432
-    name: postgres
+    - port: 5432
+      name: postgres
   clusterIP: None
   selector:
     app: postgresapp

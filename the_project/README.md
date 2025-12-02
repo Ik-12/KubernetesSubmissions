@@ -1,4 +1,4 @@
-# Exercise 3.10
+# Exercise 3.11
 
 ## DBaaS vs DIY
 
@@ -140,4 +140,28 @@ gs://dwk-project-todo-db-backup/todo-backup-2025-12-02--13-20.pgdump.gz
 gs://dwk-project-todo-db-backup/todo-backup-2025-12-02--13-25.pgdump.gz
 gs://dwk-project-todo-db-backup/todo-backup-2025-12-02--13-30.pgdump.gz
 gs://dwk-project-todo-db-backup/todo-backup-2025-12-02--13-35.pgdump.gz
+```
+
+## Set resource requests and limits
+
+1. Check current CPU and memory usage using `k top pods`:
+
+```
+NAME                                       CPU(cores)   MEMORY(bytes)
+postgres-stset-0                           1m           37Mi
+todo-app-deployment-8b4dc544-ml4kj         2m           136Mi
+todo-backend-deployment-67dbfb5cd9-zkkmx   2m           43Mi
+```
+
+2. Add request and limits that are bit higher and re-deploy.
+3. Verify that limits are applied:
+
+```
+$ k describe pods todo-app-deployment-7cf8d77c8b-klvzq | grep -A 5 Limits
+    Limits:
+      cpu:     500m
+      memory:  256Mi
+    Requests:
+      cpu:     50m
+      memory:  150Mi
 ```

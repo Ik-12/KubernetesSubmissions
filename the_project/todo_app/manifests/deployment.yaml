@@ -37,3 +37,10 @@ spec:
               value: "http://todo-backend-svc:80"
             - name: GUNICORN_OPTIONS
               value: "--log-level=debug --access-logfile - --disable-redirect-access-to-syslog"
+          resources:
+            requests:
+              memory: "150Mi"
+              cpu: "50m"
+            limits:
+              memory: "256Mi"
+              cpu: "500m"
