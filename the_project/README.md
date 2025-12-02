@@ -165,3 +165,12 @@ $ k describe pods todo-app-deployment-7cf8d77c8b-klvzq | grep -A 5 Limits
       cpu:     50m
       memory:  150Mi
 ```
+
+## GKE Log explorer
+
+1. Adjusted logging to error because Gunicorn was writing all debug logging to stderr and GKE Logging sets severity = Error for all entries written in stderr.
+
+An example from Logs Explorer when adding new todo item from browser is shown below.
+
+![Example view from GKE Log Explorer](log-example.png "Log Explorer view")
+
