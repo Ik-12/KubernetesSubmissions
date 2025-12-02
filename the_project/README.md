@@ -1,4 +1,4 @@
-# Exercise 3.9
+# Exercise 3.10
 
 ## DBaaS vs DIY
 
@@ -99,4 +99,45 @@ k --load-restrictor LoadRestrictionsNone kustomize gke/manifests/ | kubectl appl
 kubectl apply -f todo_backend/manifests/
 kubectl apply -f todo_app/manifests/
 
+```
+
+## Postgres DB backup CronJob
+
+This seemingly simple exercise proved to be rather time consuming. Most online examples mounted the Google Service Account key to the container, which seemed cumbersome and an insecure solution. After some research, I found that "Workload Identity Binding" is the proper way of providing access from the CronJob pod to the storage bucket.
+
+0. Make sure the cluster is created with "--workload-pool=<project-id>.svc.id.goog"
+1. Create a Cloud storage bucket from the Cloud Console
+2. Create a service account that has Admin permission for the bucket from the Console
+3. Create a service account for the CronJob (referenced in the manifest):
+
+```
+kubectl create serviceaccount postgres-backup-sa
+```
+
+4. Do the Workload Identity Binding:
+
+```
+gcloud iam service-accounts add-iam-policy-binding \
+    --role="roles/iam.workloadIdentityUser" \
+    --member="serviceAccount:dwk-gke-iku.svc.id.goog[project/postgres-backup-sa]" \
+     todo-db-backup@dwk-gke-iku.iam.gserviceaccount.com
+
+kubectl annotate serviceaccount postgres-backup-sa \
+    iam.gke.io/gcp-service-account=todo-db-backup@dwk-gke-iku.iam.gserviceaccount.com
+```
+
+5. Apply manually:
+
+```
+k apply -f todo_backend/manifests/06-backup.yml
+```
+
+6. Verify that backup is working (interval was set to 5 minutes for testing):
+
+```
+$ gsutil ls gs://dwk-project-todo-db-backup/
+gs://dwk-project-todo-db-backup/todo-backup-2025-12-02--13-20.pgdump.gz
+gs://dwk-project-todo-db-backup/todo-backup-2025-12-02--13-25.pgdump.gz
+gs://dwk-project-todo-db-backup/todo-backup-2025-12-02--13-30.pgdump.gz
+gs://dwk-project-todo-db-backup/todo-backup-2025-12-02--13-35.pgdump.gz
 ```
