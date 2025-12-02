@@ -32,7 +32,7 @@ spec:
             - name: POSTGRES_URL
               value: "postgresql://postgres:$(POSTGRES_PASSWORD)@postgres-svc"
             - name: GUNICORN_OPTIONS
-              value: "--log-level=debug --access-logfile - --disable-redirect-access-to-syslog"
+              value: "--log-level=error --access-logfile - --disable-redirect-access-to-syslog"
           resources:
             requests:
               memory: "64Mi"

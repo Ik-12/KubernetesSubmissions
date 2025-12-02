@@ -36,7 +36,7 @@ spec:
             - name: TODO_BACKEND_URL
               value: "http://todo-backend-svc:80"
             - name: GUNICORN_OPTIONS
-              value: "--log-level=debug --access-logfile - --disable-redirect-access-to-syslog"
+              value: "--log-level=error --access-logfile - --disable-redirect-access-to-syslog"
           resources:
             requests:
               memory: "150Mi"
