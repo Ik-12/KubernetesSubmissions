@@ -1,0 +1,71 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: add-todo-db-backup-cronjob
+  namespace: project
+spec:
+  schedule: "*/5 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: postgres-backup-sa
+          containers:
+            - name: todo-backend-backup-cron
+              # image: postgres:18
+              image: google/cloud-sdk:latest
+              # Kubernetes Service Account is bind to this Google Service Account.
+              # This allows the Pod running with postgres-backup-sa to act as postgres-backup-gsa
+              # and thus eliminates need of using storing keys in sectres and mounting them
+              # to the container which would be both cumbersome and not very secure.
+              imagePullPolicy: IfNotPresent
+              env:
+                - name: PGHOST
+                  value: postgres-svc
+                - name: PGDATABASE
+                  value: postgres
+                - name: PGUSER
+                  value: postgres
+                - name: PGPASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: pg-password
+                      key: POSTGRES_PASSWORD
+              # volumeMounts:
+              #   - name: todo-db-backup-sa-key-vol
+              #     mountPath: /secrets
+              #     readOnly: true
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  # Install Postgres client. Note: the version must match the server version
+                  # so we can't use package provided by debian.
+                  apt-get update 
+                  apt-get install -y postgresql-common
+                  /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y
+                  DEBIAN_FRONTEND=noninteractive apt-get install -y postgresql-client-18
+
+                  # Install Google Cloud SDK for gsutil
+                  # apt-get update 
+                  # apt-get install -y apt-transport-https ca-certificates gnupg curl
+                  # echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | gpg --dearmor -o /usr/share/keyrings/cloud.google.gpg && apt-get update -y && apt-get install google-cloud-cli -y
+                      
+                  # apt-get update 
+                  # apt-get install -y apt-transport-https ca-certificates gnupg curl
+                  # curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | gpg --dearmor -o /usr/share/keyrings/cloud.google.gnupg
+                  # echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" |  tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
+                  # apt-get update && apt-get install -y google-cloud-cli
+
+                  # Authenticate using a service account
+                  # gcloud auth activate-service-account todo-db-backup@dwk-gke-iku.iam.gserviceaccount.com --key-file=/secrets/todo-db-backup-sa.key
+
+                  # Do the backup
+                  BACKUP_FILE=todo-backup-$(date +"%Y-%m-%d--%H-%M").pgdump.gz
+                  pg_dump | gsutil cp -J - gs://dwk-project-todo-db-backup/$BACKUP_FILE
+          #
+          restartPolicy: OnFailure
+          # volumes:
+          #   - name: todo-db-backup-sa-key-vol
+          #     secret:
+          #       secretName: todo-db-backup-sa-key
