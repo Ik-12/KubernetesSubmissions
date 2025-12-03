@@ -9,23 +9,27 @@ POSTGRES_URL = os.environ.get('POSTGRES_URL',
 class TodoBackend:
     def __init__(self):        
         self.port = int(os.environ.get('PORT', 5005))
-        
+        self.flask_app = Flask(__name__)
         self.conn = self.init_db()
         
-        self.flask_app = Flask(__name__)
         self.setup_routes()
 
     def init_db(self):
-        conn = psycopg2.connect(POSTGRES_URL)
-        with conn.cursor() as cur:
-            cur.execute("""
-                CREATE TABLE IF NOT EXISTS todos (
-                    id SERIAL PRIMARY KEY,
-                    name TEXT NOT NULL,
-                    done BOOLEAN NOT NULL DEFAULT FALSE
-                );
-            """)
-            conn.commit()
+        try:
+            conn = psycopg2.connect(POSTGRES_URL)
+            with conn.cursor() as cur:
+                cur.execute("""
+                    CREATE TABLE IF NOT EXISTS todos (
+                        id SERIAL PRIMARY KEY,
+                        name TEXT NOT NULL,
+                        done BOOLEAN NOT NULL DEFAULT FALSE
+                    );
+                """)
+                conn.commit()
+        except Exception as e:
+            self.flask_app.logger.error(f"Failed to connect to DB at {POSTGRES_URL}: {e}")
+            return None
+
         return conn
 
     def add_todo(self, name):
@@ -45,8 +49,21 @@ class TodoBackend:
         def root():
             return "OK", 200
         
+        @self.flask_app.route("/healthz")
+        def ready():
+            if self.conn is None:
+                self.conn = self.init_db()
+
+            if self.conn is not None:
+                return "OK", 200
+            else:
+                return "Service unavailable", 503
+
         @self.flask_app.route('/todos', methods=['GET', 'POST'])
         def todo():
+            if self.conn is None:
+                self.conn = self.init_db()
+
             if request.method == 'POST':
                 todo_text = request.form.get('todo')
                 if not todo_text and request.is_json and request.json is not None:

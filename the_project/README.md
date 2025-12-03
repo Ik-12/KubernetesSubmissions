@@ -1,4 +1,4 @@
-# Exercise 3.11
+# Exercise 4.2
 
 ## DBaaS vs DIY
 
@@ -174,3 +174,35 @@ An example from Logs Explorer when adding new todo item from browser is shown be
 
 ![Example view from GKE Log Explorer](log-example.png "Log Explorer view")
 
+## Readiness and liveness probes
+
+
+Manually deploy the project without the database by commenting it out in
+`kustomization.yaml`:
+
+```
+kustomize --load-restrictor LoadRestrictionsNone build gke/manifests/ | kubectl apply -f -
+```
+
+Verify that pods are not ready because no database connection:
+
+```
+NAME                                       READY   STATUS    RESTARTS   AGE
+todo-app-deployment-74647f668b-prxqf       0/1     Running   0          81s
+todo-backend-deployment-86c4879dbb-9df8v   0/1     Running   0          81s
+```
+
+Start the database by uncommenting it from `kustomization.yaml`:
+
+```
+kustomize --load-restrictor LoadRestrictionsNone build gke/manifests/ | kubectl apply -f -
+```
+
+Verify that pods became ready:
+
+```
+NAME                                       READY   STATUS    RESTARTS      AGE
+postgres-stset-0                           1/1     Running   0             62s
+todo-app-deployment-74647f668b-prxqf       1/1     Running   2 (39s ago)   9m21s
+todo-backend-deployment-86c4879dbb-9df8v   1/1     Running   2 (51s ago)   9m21s
+```

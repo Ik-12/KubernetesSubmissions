@@ -50,6 +50,21 @@ class TodoApp:
             </html>
             """
             return render_template_string(html, todos=todos)
+        
+        @self.flask_app.route('/healthz')
+        def healthz():
+            try:
+                # Simply query the backend for todos as this is a necessary
+                # condition for the app
+                response = requests.get(BACKEND_URL + '/todos')
+                response.raise_for_status()
+            except Exception as e:
+                self.flask_app.logger.error(f"Container unhealthy: {e}")
+                self.flask_app.logger.error(f"response: {response}")
+                return "Service unavailable", 503
+
+            return "OK", 200
+
 
         @self.flask_app.route('/image')
         def image():

@@ -21,7 +21,7 @@ spec:
         fsGroup: 999
       containers:
         - name: todo-backend
-          image: docker.io/iku1/todo_backend:3.5.3
+          image: docker.io/iku1/todo_backend:4.2
           imagePullPolicy: Always
           envFrom: # Load POSTGRES_PASSWORD
             - secretRef:
@@ -40,3 +40,16 @@ spec:
             limits:
               memory: "128Mi"
               cpu: "500m"
+          readinessProbe:
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            httpGet:
+               path: /healthz
+               port: 5005
+          livenessProbe:
+            initialDelaySeconds: 60
+            periodSeconds: 60
+            failureThreshold: 3
+            httpGet:
+               path: /healthz
+               port: 5005
