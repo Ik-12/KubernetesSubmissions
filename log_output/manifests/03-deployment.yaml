@@ -64,3 +64,9 @@ spec:
                 configMapKeyRef:
                   name: hello-msg
                   key: MESSAGE # ENV name in the secret
+          readinessProbe:
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            httpGet:
+               path: /ready
+               port: 5000

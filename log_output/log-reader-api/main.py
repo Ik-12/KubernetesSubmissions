@@ -65,6 +65,16 @@ def root():
     return "OK", 200
 
 
+@app.route("/ready")
+def ready():
+    try:
+        response = requests.get(PONG_COUNT_SERVICE_URL, timeout=3)
+        response.raise_for_status()
+    except Exception as e:
+        return "Service Unavailable", 503
+
+    return "OK", 200
+
 if __name__ == "__main__":
     app.logger.info("Starting log reader API")
     app.logger.info("Log file path: %s", LOG_FILE_PATH)
