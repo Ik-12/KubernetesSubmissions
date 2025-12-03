@@ -7,5 +7,5 @@ docker exec k3d-k3s-default-agent-0 mkdir -p /tmp/kube
 # Create namespaces
 kubectl apply -f namespaces/
 
-# Create persistent volems
-kubectl apply -f namespaces/
+# Create persistent volumes
+kubectl apply -f volumes/
