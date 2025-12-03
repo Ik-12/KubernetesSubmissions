@@ -9,13 +9,17 @@ POSTGRES_URL = os.environ.get("POSTGRES_URL", "postgresql://postgres@localhost")
 class PingPongApp:
     def __init__(self):
         self.port = int(os.environ.get("PORT", 5001))
-
-        self.conn = self.init_db()
         self.flask_app = Flask(__name__)
+        self.conn = self.init_db()
         self.setup_routes()
 
     def init_db(self):
-        conn = psycopg2.connect(POSTGRES_URL)
+        try:
+            conn = psycopg2.connect(POSTGRES_URL)
+        except Exception as e:
+            self.flask_app.logger.error(f"Failed to connect to DB at {POSTGRES_URL}: {e}")
+            return None
+
         with conn.cursor() as cur:
             cur.execute("""
                 CREATE TABLE IF NOT EXISTS pong_counter (
@@ -31,6 +35,9 @@ class PingPongApp:
         return conn
 
     def get_pong_count(self):
+        if self.conn is None:
+            self.conn = self.init_db()
+
         with self.conn.cursor() as cur:
             cur.execute("SELECT pong_count FROM pong_counter WHERE id=1;")
             row = cur.fetchone()
@@ -55,6 +62,16 @@ class PingPongApp:
         def pings():
             count = self.get_pong_count()
             return jsonify({"pong_count": count})
+
+        @self.flask_app.route("/ready")
+        def ready():
+            if self.conn is None:
+                self.conn = self.init_db()
+
+            if self.conn is not None:
+                return "OK", 200
+            else:
+                return "Service unavailable", 503
 
     def run(self):
         self.flask_app.logger.info(f"Server started in port {self.port}")
