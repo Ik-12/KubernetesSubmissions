@@ -51,3 +51,4 @@
 - [4.1](https://github.com/Ik-12/KubernetesSubmissions/tree/4.1/ping_pong)
 - [4.2](https://github.com/Ik-12/KubernetesSubmissions/tree/4.2/the_project)
 - [4.3](https://github.com/Ik-12/KubernetesSubmissions/tree/4.3/the_project)
+- [4.4](https://github.com/Ik-12/KubernetesSubmissions/tree/4.4/ping_pong)
