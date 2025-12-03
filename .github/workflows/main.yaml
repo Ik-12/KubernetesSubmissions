@@ -14,8 +14,179 @@ env:
   BRANCH: ${{ github.ref_name }}
 
 jobs:
-  build-publish-deploy:
-    name: Build, Publish and Deploy
+  detect-changes:
+    name: Detect Changes
+    runs-on: ubuntu-latest
+    outputs:
+      ping-pong: ${{ steps.filter.outputs.ping-pong }}
+      log-output: ${{ steps.filter.outputs.log-output }}
+      todo-app: ${{ steps.filter.outputs.todo-app }}
+      todo-backend: ${{ steps.filter.outputs.todo-backend }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          base: ${{ github.event.repository.default_branch }}
+          filters: |
+            ping-pong:
+              - 'ping_pong/**'
+            log-output:
+              - 'log_output/**'
+            the-project:
+              - 'the_project/**'
+
+
+  build-publish-deploy-ping-pong:
+    name: Build, Publish and Deploy Ping Pong App
+    needs: detect-changes
+    if: needs.detect-changes.outputs.ping-pong == 'true'
+    environment: GKE
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - uses: google-github-actions/auth@v2
+        with:
+          credentials_json: "${{ secrets.GKE_SA_KEY }}"
+
+      - name: "Set up Cloud SDK"
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: "Use gcloud CLI"
+        run: gcloud info
+
+      - name: "Configure docker to use GKE registry"
+        run: gcloud --quiet auth configure-docker $REGISTRY
+
+      - name: "Get GKE credentials"
+        uses: "google-github-actions/get-gke-credentials@v2"
+        with:
+          cluster_name: "${{ env.GKE_CLUSTER }}"
+          project_id: "${{ env.PROJECT_ID }}"
+          location: "${{ env.GKE_ZONE }}"
+
+      - name: "Form the image name"
+        run: echo "IMAGE_TAG=$REGISTRY/$PROJECT_ID/$REPOSITORY/ping_pong:$BRANCH-$GITHUB_SHA" >> $GITHUB_ENV
+
+      - name: Build and push the image
+        if: ${{ !env.ACT_SKIP_BUILD }}
+        uses: docker/build-push-action@v4
+        with:
+          context: ./ping_pong
+          push: true
+          tags: ${{ env.IMAGE_TAG }}
+
+      - name: Install kubectl CLI
+        uses: azure/setup-kubectl@v4
+        with:
+          version: "latest"
+
+      - name: Set up Kustomize
+        uses: imranismail/setup-kustomize@v2.1.0
+        with:
+          # Need to make local runner using act to work
+          github-token: "${{ secrets.GITHUB_TOKEN }}"
+
+      - name: Deploy
+        working-directory: ping_pong/gke/manifests
+        run: |-
+          # Set namespace based on branch name
+          kubectl create namespace "exercises" || true
+          kubectl config set-context --current --namespace="exercises"
+
+          # Use the images we just build and pushed
+          kustomize edit set image ping_pong:\*=$IMAGE_TAG
+
+          kustomize --load-restrictor LoadRestrictionsNone build . | kubectl apply -f -
+          kubectl get services -o wide
+
+  build-publish-deploy-log-output:
+    name: Build, Publish and Deploy Log Output App
+    needs: detect-changes
+    if: needs.detect-changes.outputs.log-output == 'true'
+    environment: GKE
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - uses: google-github-actions/auth@v2
+        with:
+          credentials_json: "${{ secrets.GKE_SA_KEY }}"
+
+      - name: "Set up Cloud SDK"
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: "Use gcloud CLI"
+        run: gcloud info
+
+      - name: "Configure docker to use GKE registry"
+        run: gcloud --quiet auth configure-docker $REGISTRY
+
+      - name: "Get GKE credentials"
+        uses: "google-github-actions/get-gke-credentials@v2"
+        with:
+          cluster_name: "${{ env.GKE_CLUSTER }}"
+          project_id: "${{ env.PROJECT_ID }}"
+          location: "${{ env.GKE_ZONE }}"
+
+      - name: "Form the Log Reader image name"
+        run: echo "READER_IMAGE_TAG=$REGISTRY/$PROJECT_ID/$REPOSITORY/log_output_reader_api:$BRANCH-$GITHUB_SHA" >> $GITHUB_ENV
+
+      - name: Build and push the Log Reader image
+        if: ${{ !env.ACT_SKIP_BUILD }}
+        uses: docker/build-push-action@v4
+        with:
+          context: ./log_output/log-reader-api
+          push: true
+          tags: ${{ env.READER_IMAGE_TAG }}
+      
+      - name: "Form the Log Writer image name"
+        run: echo "WRITER_IMAGE_TAG=$REGISTRY/$PROJECT_ID/$REPOSITORY/log_output_writer:$BRANCH-$GITHUB_SHA" >> $GITHUB_ENV
+
+      - name: Build and push the Log Reader image
+        if: ${{ !env.ACT_SKIP_BUILD }}
+        uses: docker/build-push-action@v4
+        with:
+          context: ./log_output/log-writer
+          push: true
+          tags: ${{ env.WRITER_IMAGE_TAG }}
+
+      - name: Install kubectl CLI
+        uses: azure/setup-kubectl@v4
+        with:
+          version: "latest"
+
+      - name: Set up Kustomize
+        uses: imranismail/setup-kustomize@v2.1.0
+        with:
+          # Need to make local runner using act to work
+          github-token: "${{ secrets.GITHUB_TOKEN }}"
+
+      - name: Deploy
+        working-directory: log_output/gke/manifests
+        run: |-
+          # Set namespace based on branch name
+          kubectl create namespace "exercises" || true
+          kubectl config set-context --current --namespace="exercises"
+
+          # Use the images we just build and pushed
+          kustomize edit set image log_output_reader_api::\*=$READER_IMAGE_TAG
+          kustomize edit set image log_output_writer:\*=$WRITER_IMAGE_TAG
+
+          kustomize --load-restrictor LoadRestrictionsNone build . | kubectl apply -f -
+          kubectl get services -o wide
+
+  build-publish-deploy-the-project:
+    name: Build, Publish and Deploy The Project
+    needs: detect-changes
+    if: needs.detect-changes.outputs.the-project == 'true'
     environment: GKE
     runs-on: ubuntu-latest
 
