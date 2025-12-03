@@ -172,7 +172,7 @@ $ k describe pods todo-app-deployment-7cf8d77c8b-klvzq | grep -A 5 Limits
 
 An example from Logs Explorer when adding new todo item from browser is shown below.
 
-![Example view from GKE Log Explorer](log-example.png "Log Explorer view")
+![Example view from GKE Log Explorer](screenshots/log-example.png "Log Explorer view")
 
 ## Readiness and liveness probes
 
@@ -206,3 +206,7 @@ postgres-stset-0                           1/1     Running   0             62s
 todo-app-deployment-74647f668b-prxqf       1/1     Running   2 (39s ago)   9m21s
 todo-backend-deployment-86c4879dbb-9df8v   1/1     Running   2 (51s ago)   9m21s
 ```
+
+## Prometheus queries
+
+![Example view from GKE Log Explorer](screenshots/prometheus-count.png "An example Prometheus query")
