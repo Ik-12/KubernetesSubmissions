@@ -1,4 +1,4 @@
-# Exercise 3.1
+# Exercise 4.1
 
 ## Google Kubernetes Engine (GKE) Cluster Configuration
 
@@ -59,4 +59,37 @@ kubectl exec -it postgres-stset-0 -- su postgres -c pg_dump | egrep '^COPY publi
 
 ```sh
 docker build . -t <namespace>/ping_pong:2.7
+```
+
+## Readiness probes
+
+Manually deploy ping pong and log output apps with the database by commenting it out in
+`kustomization.yaml`:
+
+```
+kustomize --load-restrictor LoadRestrictionsNone build ping_pong/gke/manifests/ | kubectl apply -f -
+kustomize --load-restrictor LoadRestrictionsNone build log_outputgke/manifests/ | kubectl apply -f -
+```
+
+Verify that pods are create but not marked as running because the probe is failing:
+
+```
+NAME                                     READY   STATUS    RESTARTS   AGE
+log-output-deployment-5fbb489dc9-phqjp   1/2     Running   0          16m
+ping-pong-deployment-c9b85b67b-s8sc5     0/1     Running   0          5m38s
+```
+
+Start the database:
+
+```
+kubectl apply -f ping_pong/gke/01-database.yaml
+```
+
+Verify that pods become ready:
+
+```
+NAME                                     READY   STATUS    RESTARTS   AGE
+log-output-deployment-5fbb489dc9-phqjp   2/2     Running   0          19m
+ping-pong-deployment-c9b85b67b-s8sc5     1/1     Running   0          8m17s
+postgres-stset-0                         1/1     Running   0          2m
 ```
