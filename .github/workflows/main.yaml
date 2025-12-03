@@ -4,6 +4,11 @@ on:
   push:
     branches:
       - "**"
+  workflow_dispatch:
+    inputs:
+      force:
+        required: true
+        default: 'false'
 
 env:
   PROJECT_ID: ${{ secrets.GKE_PROJECT }}
@@ -42,7 +47,7 @@ jobs:
   build-publish-deploy-ping-pong:
     name: Build, Publish and Deploy Ping Pong App
     needs: detect-changes
-    if: needs.detect-changes.outputs.ping-pong == 'true'
+    if: needs.detect-changes.outputs.ping-pong == 'true' || ${{ github.event.inputs.force != 'true' }}
     environment: GKE
     runs-on: ubuntu-latest
 
