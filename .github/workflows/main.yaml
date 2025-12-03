@@ -6,8 +6,17 @@ on:
       - "**"
   workflow_dispatch:
     inputs:
-      force:
-        required: true
+      force_ping_pong:
+        description: "Force build ping_pong"
+        required: false
+        default: 'false'
+      force_log_output:
+        description: "Force build log_output"
+        required: false
+        default: 'false'
+      force_the_project:
+        description: "Force build the project"
+        required: false
         default: 'false'
 
 env:
@@ -47,7 +56,7 @@ jobs:
   build-publish-deploy-ping-pong:
     name: Build, Publish and Deploy Ping Pong App
     needs: detect-changes
-    if: needs.detect-changes.outputs.ping-pong == 'true' || ${{ github.event.inputs.force != 'true' }}
+    if: needs.detect-changes.outputs.ping-pong == 'true' || ${{ github.event.inputs.force_ping_pong != 'true' }}
     environment: GKE
     runs-on: ubuntu-latest
 
@@ -113,7 +122,7 @@ jobs:
   build-publish-deploy-log-output:
     name: Build, Publish and Deploy Log Output App
     needs: detect-changes
-    if: needs.detect-changes.outputs.log-output == 'true'
+    if: needs.detect-changes.outputs.log-output == 'true' || ${{ github.event.inputs.force_log_output != 'true' }}
     environment: GKE
     runs-on: ubuntu-latest
 
@@ -191,7 +200,7 @@ jobs:
   build-publish-deploy-the-project:
     name: Build, Publish and Deploy The Project
     needs: detect-changes
-    if: needs.detect-changes.outputs.the-project == 'true'
+    if: needs.detect-changes.outputs.the-project == 'true' || ${{ github.event.inputs.force_the_project != 'true' }}
     environment: GKE
     runs-on: ubuntu-latest
 
