@@ -100,7 +100,7 @@ jobs:
           kubectl config set-context --current --namespace="exercises"
 
           # Use the images we just build and pushed
-          kustomize edit set image ping_pong:\*=$IMAGE_TAG
+          kustomize edit set image \*/ping_pong:\*=$IMAGE_TAG
 
           kustomize --load-restrictor LoadRestrictionsNone build . | kubectl apply -f -
           kubectl get services -o wide
@@ -177,8 +177,8 @@ jobs:
           kubectl config set-context --current --namespace="exercises"
 
           # Use the images we just build and pushed
-          kustomize edit set image log_output_reader_api::\*=$READER_IMAGE_TAG
-          kustomize edit set image log_output_writer:\*=$WRITER_IMAGE_TAG
+          kustomize edit set image \*/log_output_reader_api::\*=$READER_IMAGE_TAG
+          kustomize edit set image \*/log_output_writer:\*=$WRITER_IMAGE_TAG
 
           kustomize --load-restrictor LoadRestrictionsNone build . | kubectl apply -f -
           kubectl get services -o wide
@@ -271,8 +271,8 @@ jobs:
           kubectl create secret generic pg-password --from-literal=POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
 
           # Use the images we just build and pushed
-          kustomize edit set image todo_app:\*=$TODO_APP_IMAGE_TAG
-          kustomize edit set image todo_backend:\*=$TODO_BACKEND_IMAGE_TAG
+          kustomize edit set image \*/todo_app:\*=$TODO_APP_IMAGE_TAG
+          kustomize edit set image \*/todo_backend:\*=$TODO_BACKEND_IMAGE_TAG
 
           kustomize --load-restrictor LoadRestrictionsNone build . | kubectl apply -f -
           kubectl get services -o wide
