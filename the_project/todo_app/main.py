@@ -43,9 +43,25 @@ class TodoApp:
                 <h3>Todo Items:</h3>
                 <ul>
                     {% for item in todos %}
-                        <li>{{ item["name"] }}</li>
+                        {% if item ["done"] %}
+                            <li><s>{{ item["name"] }}</s></li>
+                        {% else %}
+                            <li>
+                                {{ item["name"] }}
+                                <button onclick="markDone({{ item['id'] }})">Mark done</button>
+                            </li>
+                        {% endif %}
                     {% endfor %}
                 </ul>
+
+                <script>
+                    function markDone(id) {
+                        fetch('/todos/' + id, {
+                            method: 'PUT'
+                        }).then(() => location.reload());
+                    }
+                </script>
+
             </body>
             </html>
             """

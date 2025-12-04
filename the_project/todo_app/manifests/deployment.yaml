@@ -25,7 +25,7 @@ spec:
         fsGroup: 999
       containers:
         - name: todo-app
-          image: docker.io/iku1/todo_app:4.2.2
+          image: docker.io/iku1/todo_app:4.5
           imagePullPolicy: Always
           volumeMounts:
             - name: img-cache
