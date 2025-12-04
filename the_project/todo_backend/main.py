@@ -10,7 +10,7 @@ class TodoBackend:
     def __init__(self):        
         self.port = int(os.environ.get('PORT', 5005))
         self.flask_app = Flask(__name__)
-        self.conn = self.init_db()
+        self.db_conn = self.init_db()
         
         self.setup_routes()
 
@@ -33,24 +33,24 @@ class TodoBackend:
         return conn
 
     def add_todo(self, name):
-        with self.conn.cursor() as cur:
+        with self.db_conn.cursor() as cur:
             cur.execute("INSERT INTO todos (name, done) VALUES (%s, FALSE) RETURNING id;", (name,))
-            self.conn.commit()
+            self.db_conn.commit()
             return cur.fetchone()[0] # type: ignore
 
     def mark_done(self, id):
-        with self.conn.cursor() as cur:
+        with self.db_conn.cursor() as cur:
             cur.execute(
                 "UPDATE todos SET done = TRUE WHERE id = %s RETURNING done",
                 (id,)
             )
             result = cur.fetchone()
-            self.conn.commit()
+            self.db_conn.commit()
 
             return result[0] if result else None
 
     def get_todos(self):
-        with self.conn.cursor() as cur:
+        with self.db_conn.cursor() as cur:
             cur.execute("SELECT id, name, done FROM todos ORDER BY id;")
             rows = cur.fetchall()
             return [{"id": r[0], "name": r[1], "done": r[2]} for r in rows]
@@ -62,18 +62,18 @@ class TodoBackend:
         
         @self.flask_app.route("/healthz")
         def ready():
-            if self.conn is None:
-                self.conn = self.init_db()
+            if self.db_conn is None:
+                self.db_conn = self.init_db()
 
-            if self.conn is not None:
+            if self.db_conn is not None:
                 return "OK", 200
             else:
                 return "Service unavailable", 503
 
         @self.flask_app.route('/todos', methods=['GET', 'POST'])
         def todo():
-            if self.conn is None:
-                self.conn = self.init_db()
+            if self.db_conn is None:
+                self.db_conn = self.init_db()
 
             if request.method == 'POST':
                 todo_text = request.form.get('todo')
