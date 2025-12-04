@@ -38,6 +38,17 @@ class TodoBackend:
             self.conn.commit()
             return cur.fetchone()[0] # type: ignore
 
+    def mark_done(self, id):
+        with self.conn.cursor() as cur:
+            cur.execute(
+                "UPDATE todos SET done = TRUE WHERE id = %s RETURNING done",
+                (id,)
+            )
+            result = cur.fetchone()
+            self.conn.commit()
+
+            return result[0] if result else None
+
     def get_todos(self):
         with self.conn.cursor() as cur:
             cur.execute("SELECT id, name, done FROM todos ORDER BY id;")
@@ -81,11 +92,17 @@ class TodoBackend:
                 todo_id = self.add_todo(todo_text)
                 self.flask_app.logger.info(f"Added todo item {repr(todo_text)} with id {todo_id}")
                 return redirect("/")
-
             elif request.method == 'GET':
                 return jsonify({"todos": self.get_todos()})
             else:
                 return jsonify({"error": "Method not allowed"}), 405
+
+        @self.flask_app.route('/todos/<int:id>', methods=['PUT'])
+        def mark_done_route(id):
+            if self.mark_done(id) is not None:
+                return redirect("/")
+            else:
+                return "Not Found", 404
 
     def run(self):
         self.flask_app.logger.info(f"Backend started in port {self.port}")

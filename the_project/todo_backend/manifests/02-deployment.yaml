@@ -21,7 +21,7 @@ spec:
         fsGroup: 999
       containers:
         - name: todo-backend
-          image: docker.io/iku1/todo_backend:4.2
+          image: docker.io/iku1/todo_backend:4.5.2
           imagePullPolicy: Always
           envFrom: # Load POSTGRES_PASSWORD
             - secretRef:
