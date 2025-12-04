@@ -14,7 +14,7 @@ REFRESH_INTERVAL = 600 # seconds
 
 class TodoApp:
     def __init__(self):        
-        self.port = int(os.environ.get('PORT', 5000))
+        self.port = int(os.environ.get('PORT', 5001))
         self.flask_app = Flask(__name__)
         self.setup_routes()
         
