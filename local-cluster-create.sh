@@ -9,3 +9,8 @@ kubectl apply -f namespaces/
 
 # Create persistent volumes
 kubectl apply -f volumes/
+
+# Create secrets
+export SOPS_AGE_KEY_FILE=$HOME/key.txt
+sops --decrypt manifests/secret.enc.yaml | kubectl apply -f -
+
