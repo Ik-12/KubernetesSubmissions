@@ -34,8 +34,7 @@ jobs:
     outputs:
       ping-pong: ${{ steps.filter.outputs.ping-pong }}
       log-output: ${{ steps.filter.outputs.log-output }}
-      todo-app: ${{ steps.filter.outputs.todo-app }}
-      todo-backend: ${{ steps.filter.outputs.todo-backend }}
+      the-project: ${{ steps.filter.outputs.the-project }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -252,13 +251,24 @@ jobs:
       - name: "Form the todo-backend image name"
         run: echo "TODO_BACKEND_IMAGE_TAG=$REGISTRY/$PROJECT_ID/$REPOSITORY/todo_backend:$BRANCH-$GITHUB_SHA" >> $GITHUB_ENV
 
-      - name: Build and push todo-app image
+      - name: Build and push todo-backend image
         if: ${{ !env.ACT_SKIP_BUILD }}
         uses: docker/build-push-action@v4
         with:
           context: ./the_project/todo_backend
           push: true
           tags: ${{ env.TODO_BACKEND_IMAGE_TAG }}
+
+      - name: "Form the todo-broadcaster image name"
+        run: echo "TODO_BROADCASTER_IMAGE_TAG=$REGISTRY/$PROJECT_ID/$REPOSITORY/todo_broadcaster:$BRANCH-$GITHUB_SHA" >> $GITHUB_ENV
+
+      - name: Build and push todo-broadcaster image
+        if: ${{ !env.ACT_SKIP_BUILD }}
+        uses: docker/build-push-action@v4
+        with:
+          context: ./the_project/todo_broadcaster
+          push: true
+          tags: ${{ env.TODO_BROADCASTER_IMAGE_TAG }}
 
       - name: Install kubectl CLI
         uses: azure/setup-kubectl@v4
@@ -283,10 +293,13 @@ jobs:
           # Create secrets
           kubectl delete secret pg-password || true
           kubectl create secret generic pg-password --from-literal=POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
+          kubectl delete secret broadcaster-secret || true
+          kubectl create secret generic broadcaster-secret --from-literal=APPRISE_URL=${{ secrets.APPRISE_URL }}
 
           # Use the images we just build and pushed
           kustomize edit set image \*/todo_app:\*=$TODO_APP_IMAGE_TAG
           kustomize edit set image \*/todo_backend:\*=$TODO_BACKEND_IMAGE_TAG
+          kustomize edit set image \*/todo_broadcaster:\*=$TODO_BROADCASTER_IMAGE_TAG
 
           kustomize --load-restrictor LoadRestrictionsNone build . | kubectl apply -f -
           kubectl get services -o wide
