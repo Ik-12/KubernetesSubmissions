@@ -12,5 +12,15 @@ kubectl apply -f volumes/
 
 # Create secrets
 export SOPS_AGE_KEY_FILE=$HOME/key.txt
-sops --decrypt manifests/secret.enc.yaml | kubectl apply -f -
+sops --decrypt manifests/the_project/secret.enc.yaml | kubectl apply -f -
+
+# Create GCP Artifact Registry docker-registry secret in all namespaces
+namespaces=$(kubectl get ns -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}')
+for ns in $namespaces; do
+    kubectl create secret docker-registry gcp-artifact-registry \
+       --docker-server=europe-north1-docker.pkg.dev \
+       --docker-username=_json_key \
+       --docker-password="$(cat ~/.secrets/sa-docker-pull-from-local.key)" \
+       --docker-email=ikujamaki@gmail.com
+done
 

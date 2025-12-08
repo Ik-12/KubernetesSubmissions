@@ -29,6 +29,8 @@ spec:
         runAsUser: 999
         runAsGroup: 999
         fsGroup: 999
+      imagePullSecrets:
+      - name: gcp-artifact-registry
       containers:
         - name: log-writer
           image: docker.io/iku1/log_output_writer:3.2
