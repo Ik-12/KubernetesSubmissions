@@ -4,9 +4,9 @@ resources:
   - ../../manifests/namespace.yaml
   - ../../../volumes/persistent_imgcache_claim.yaml
   # Broadcaster
-  - ../../todo_broadcaster/00-nats.yml
-  - ../../todo_broadcaster/01-nats-service.yaml
-  - ../../todo_broadcaster/02-deployment.yaml
+  - ../../todo_broadcaster/manifests/00-nats.yml
+  - ../../todo_broadcaster/manifests/01-nats-service.yaml
+  - ../../todo_broadcaster/manifests/02-deployment.yaml
   # Backend
   - ../../todo_backend/manifests/01-database.yaml
   - ../../todo_backend/manifests/02-deployment.yaml
