@@ -55,3 +55,4 @@
 - [4.5](https://github.com/Ik-12/KubernetesSubmissions/tree/4.5/the_project)
 - [4.6](https://github.com/Ik-12/KubernetesSubmissions/tree/4.6/the_project/todo_broadcaster)
 - [4.7](https://github.com/Ik-12/KubernetesSubmissions/tree/4.7/log_output)
+- [4.8](https://github.com/Ik-12/KubernetesSubmissions/tree/4.8/the_project)
