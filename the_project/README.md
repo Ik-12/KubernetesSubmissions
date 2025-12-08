@@ -1,4 +1,56 @@
-# Exercise 4.2
+# Exercise 4.7
+
+## GitOps deployment strategy
+
+In earlier exercises, we already used GitHub actions to automatically deploy the project to GKE. Thus, for this exercise it made most sense
+to configure GitOps deployment to local cluster, especially as this required pull-style approach using ArgoCD or similar service.
+
+For some reasons Argo CD did not recognize the kustomization.yaml properly when placed in
+`manifests/` directory. The `Path` selector in new Application dialog correctly showed
+the path 'the_project/manifest/' but syncing failed with error 'Resource not found in
+cluster: kustomize.config.k8s.io/v1beta1/Kustomization:undefined' which indicates it was
+trying to apply it as normal manifest file. Moving the file to `the_project/` level
+and updating the paths accordingly fixed the problem.
+
+### Architecture
+
+The GitOps process is configure as follows:
+
+1. Push event automatically builds the docker images and pushes them to GCP Artifact registry 
+2. Kustomize is used configure both GKE and local deployment to use these image and this change is committed to repository to branches main-gke-deploy / main-local-deploy.
+3. ArgoCD running on local cluster is configure to watch branch 'main-local-deploy' and it automatically deploys new version when a new commit is detected
+4. GitHub Actions and kubectl is used to deploy to GKE but only if the cluster is running
+
+### Pulling from GCP Artifact registry on local cluster
+
+To pull images from private GCP Artifact registry on the local cluster, authentication must be configure. This could be done using existing Service Account, but I decided to configure a new one with only the required permissions:
+
+```
+gcloud iam service-accounts create sa-docker-pull-from-local --display-name "Service Account For Pulling from Local Cluster"
+
+gcloud projects add-iam-policy-binding dwk-gke-iku \
+   --member="serviceAccount:my-service-account@dwk-gke-iku.iam.gserviceaccount.com" \
+   --role="roles/artifactregistry.reader"
+
+gcloud iam service-accounts keys create ~/.secrets/sa-docker-pull-from-local.key \
+   --iam-account sa-docker-pull-from-local@dwk-gke-iku.iam.gserviceaccount.com
+
+kubectl create secret docker-registry gcp-artifact-registry \
+   --docker-server=europe-north1-docker.pkg.dev \
+   --docker-username=_json_key \
+   --docker-password="$(cat ~/.secrets/sa-docker-pull-from-local.key)" \
+   --docker-email=<redacted>
+```
+
+And to use the secret when pulling images in deployment manifest:
+
+```
+      ...
+      imagePullSecrets:
+      - name: gcp-artifact-registry
+      containers:
+      ...
+```
 
 ## DBaaS vs DIY
 
