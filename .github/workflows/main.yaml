@@ -126,7 +126,7 @@ jobs:
         uses: EndBug/add-and-commit@v9
         with:
           new_branch: main-gke-deploy
-          push: '--set-upstream origin --force'
+          push: '--force'
           add: './ping_pong/gke/manifests/kustomization.yaml'
           message: New version released ${{ github.sha }} to GKE
 
@@ -139,7 +139,7 @@ jobs:
         uses: EndBug/add-and-commit@v9
         with:
           new_branch: main-local-deploy
-          push: '--set-upstream origin --force'
+          push: '--force'
           add: './ping_pong/manifests/kustomization.yaml'
           message: New version released ${{ github.sha }} for local deployment
 
@@ -240,7 +240,7 @@ jobs:
         uses: EndBug/add-and-commit@v9
         with:
           new_branch: main-gke-deploy
-          push: '--set-upstream origin --force'
+          push: '--force'
           add: './log_outpuT/gke/manifests/kustomization.yaml'
           message: New version released ${{ github.sha }} to GKE
 
@@ -254,7 +254,7 @@ jobs:
         uses: EndBug/add-and-commit@v9
         with:
           new_branch: main-local-deploy
-          push: '--set-upstream origin --force'
+          push: '--force'
           add: './log_output/manifests/kustomization.yaml'
           message: New version released ${{ github.sha }} for local deployment
 
@@ -300,10 +300,22 @@ jobs:
       - name: "Use gcloud CLI"
         run: gcloud info
 
+      - name: Check if GKE cluster is running
+        id: check-cluster
+        run: |
+          CLUSTER_STATUS=$(gcloud container clusters describe $GKE_CLUSTER --zone $GKE_ZONE --format="value(status)" 2> /dev/null || echo "NOT_FOUND")
+          echo "CLUSTER_STATUS=$CLUSTER_STATUS" >> $GITHUB_ENV
+          if [ "$CLUSTER_STATUS" = "RUNNING" ]; then
+            echo "Cluster is running."
+          else
+            echo "Cluster is not running or does not exist."
+          fi
+
       - name: "Configure docker to use GKE registry"
         run: gcloud --quiet auth configure-docker $REGISTRY
 
       - name: "Get GKE credentials"
+        if: env.CLUSTER_STATUS == 'RUNNING'
         uses: "google-github-actions/get-gke-credentials@v2"
         with:
           cluster_name: "${{ env.GKE_CLUSTER }}"
@@ -354,7 +366,38 @@ jobs:
           # Need to make local runner using act to work
           github-token: "${{ secrets.GITHUB_TOKEN }}"
 
-      - name: Deploy
+      - name: Update GKE kustomization.yaml with new image tag
+        working-directory: the_project/gke/manifests
+        run: |
+          # Use the images we just build and pushed
+          kustomize edit set image \*/todo_app:\*=$TODO_APP_IMAGE_TAG
+          kustomize edit set image \*/todo_backend:\*=$TODO_BACKEND_IMAGE_TAG
+          kustomize edit set image \*/todo_broadcaster:\*=$TODO_BROADCASTER_IMAGE_TAG
+
+      - name: Commit GKE kustomization.yaml to GitHub
+        uses: EndBug/add-and-commit@v9
+        with:
+          new_branch: main-gke-deploy
+          add: './the_project/gke/manifests/kustomization.yaml'
+          message: New version released ${{ github.sha }} to GKE
+
+      - name: Update Local cluster kustomization.yaml with new image tag
+        working-directory: the_project/manifests
+        run: |
+          # Use the images we just build and pushed
+          kustomize edit set image \*/todo_app:\*=$TODO_APP_IMAGE_TAG
+          kustomize edit set image \*/todo_backend:\*=$TODO_BACKEND_IMAGE_TAG
+          kustomize edit set image \*/todo_broadcaster:\*=$TODO_BROADCASTER_IMAGE_TAG
+
+      - name: Commit local kustomization.yaml to GitHub
+        uses: EndBug/add-and-commit@v9
+        with:
+          new_branch: main-local-deploy
+          add: './the_project/manifests/kustomization.yaml'
+          message: New version released ${{ github.sha }} for local deployment
+
+      - name: Deploy to GKE if cluster is running
+        if: env.CLUSTER_STATUS == 'RUNNING'
         working-directory: the_project/gke/manifests
         run: |-
           # Set namespace based on branch name
@@ -368,11 +411,6 @@ jobs:
           kubectl create secret generic pg-password --from-literal=POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
           kubectl delete secret broadcaster-secret || true
           kubectl create secret generic broadcaster-secret --from-literal=APPRISE_URL=${{ secrets.APPRISE_URL }}
-
-          # Use the images we just build and pushed
-          kustomize edit set image \*/todo_app:\*=$TODO_APP_IMAGE_TAG
-          kustomize edit set image \*/todo_backend:\*=$TODO_BACKEND_IMAGE_TAG
-          kustomize edit set image \*/todo_broadcaster:\*=$TODO_BROADCASTER_IMAGE_TAG
 
           kustomize --load-restrictor LoadRestrictionsNone build . | kubectl apply -f -
           kubectl get services -o wide
