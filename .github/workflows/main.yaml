@@ -76,8 +76,20 @@ jobs:
       - name: "Configure docker to use GKE registry"
         run: gcloud --quiet auth configure-docker $REGISTRY
 
+      - name: Check if GKE cluster is running
+        id: check-cluster
+        run: |
+          CLUSTER_STATUS=$(gcloud container clusters describe $GKE_CLUSTER --zone $GKE_ZONE --format="value(status)" 2> /dev/null || echo "NOT_FOUND")
+          echo "CLUSTER_STATUS=$CLUSTER_STATUS" >> $GITHUB_ENV
+          if [ "$CLUSTER_STATUS" = "RUNNING" ]; then
+            echo "Cluster is running."
+          else
+            echo "Cluster is not running or does not exist."
+          fi
+
       - name: "Get GKE credentials"
         uses: "google-github-actions/get-gke-credentials@v2"
+        if: env.CLUSTER_STATUS == 'RUNNING'
         with:
           cluster_name: "${{ env.GKE_CLUSTER }}"
           project_id: "${{ env.PROJECT_ID }}"
@@ -105,15 +117,35 @@ jobs:
           # Need to make local runner using act to work
           github-token: "${{ secrets.GITHUB_TOKEN }}"
 
-      - name: Deploy
+      - name: Update GKE kustomization.yaml with new image tag
+        working-directory: ping_pong/gke/manifests
+        run: |
+          kustomize edit set image \*/ping_pong:\*=$IMAGE_TAG
+
+      - name: Commit GKE kustomization.yaml to GitHub
+        uses: EndBug/add-and-commit@v9
+        with:
+          new_branch: main-gke-deploy
+          add: './ping_pong/gke/manifests/kustomization.yaml'
+          message: New version released ${{ github.sha }} to GKE
+
+      - name: Update Local cluster kustomization.yaml with new image tag
+        working-directory: ping_pong/manifests
+        run: |
+          kustomize edit set image \*/ping_pong:\*=$IMAGE_TAG
+
+      - name: Commit local kustomization.yaml to GitHub
+        uses: EndBug/add-and-commit@v9
+        with:
+          new_branch: main-local-deploy
+          add: './ping_pong/manifests/kustomization.yaml'
+          message: New version released ${{ github.sha }} to GKE
+
+      - name: Deploy to GKE if cluster is running
         working-directory: ping_pong/gke/manifests
         run: |-
-          # Set namespace based on branch name
           kubectl create namespace "exercises" || true
           kubectl config set-context --current --namespace="exercises"
-
-          # Use the images we just build and pushed
-          kustomize edit set image \*/ping_pong:\*=$IMAGE_TAG
 
           kustomize --load-restrictor LoadRestrictionsNone build . | kubectl apply -f -
           kubectl get services -o wide

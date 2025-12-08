@@ -17,6 +17,8 @@ spec:
         runAsUser: 999
         runAsGroup: 999
         fsGroup: 999
+      imagePullSecrets:
+      - name: gcp-artifact-registry
       containers:
         - name: ping-pong
           image: docker.io/iku1/ping_pong:4.1.1
