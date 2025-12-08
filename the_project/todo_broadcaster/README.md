@@ -17,3 +17,7 @@ items to selected notification service.
 
 Specify the notifaction service using key APPRISE_URL in secret broadcaster-secret. For
 example: https://discord.com/api/webhooks/466749326fwf76BlrQAjJQWKzP_ycy2N78lrr11AtcC 
+
+```
+k apply -f ~/.secrets/broadcaster.yaml
+```
