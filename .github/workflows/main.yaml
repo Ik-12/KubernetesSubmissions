@@ -51,7 +51,6 @@ jobs:
             the-project:
               - 'the_project/**'
 
-
   build-publish-deploy-ping-pong:
     name: Build, Publish and Deploy Ping Pong App
     needs: detect-changes
@@ -248,7 +247,8 @@ jobs:
       - name: Update Local cluster kustomization.yaml with new image tag
         working-directory: log_output/manifests
         run: |
-          kustomize edit set image \*/ping_pong:\*=$IMAGE_TAG
+          kustomize edit set image \*/log_output_reader_api::\*=$READER_IMAGE_TAG
+          kustomize edit set image \*/log_output_writer:\*=$WRITER_IMAGE_TAG
 
       - name: Commit local kustomization.yaml to GitHub
         uses: EndBug/add-and-commit@v9
