@@ -126,6 +126,7 @@ jobs:
         uses: EndBug/add-and-commit@v9
         with:
           new_branch: main-gke-deploy
+          push: '--set-upstream --force'
           add: './ping_pong/gke/manifests/kustomization.yaml'
           message: New version released ${{ github.sha }} to GKE
 
@@ -138,6 +139,7 @@ jobs:
         uses: EndBug/add-and-commit@v9
         with:
           new_branch: main-local-deploy
+          push: '--set-upstream --force'
           add: './ping_pong/manifests/kustomization.yaml'
           message: New version released ${{ github.sha }} for local deployment
 
@@ -238,6 +240,7 @@ jobs:
         uses: EndBug/add-and-commit@v9
         with:
           new_branch: main-gke-deploy
+          push: '--set-upstream --force'
           add: './log_outpuT/gke/manifests/kustomization.yaml'
           message: New version released ${{ github.sha }} to GKE
 
@@ -251,6 +254,7 @@ jobs:
         uses: EndBug/add-and-commit@v9
         with:
           new_branch: main-local-deploy
+          push: '--set-upstream --force'
           add: './log_output/manifests/kustomization.yaml'
           message: New version released ${{ github.sha }} for local deployment
 
