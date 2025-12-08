@@ -19,6 +19,8 @@ spec:
         runAsUser: 999
         runAsGroup: 999
         fsGroup: 999
+      imagePullSecrets:
+      - name: gcp-artifact-registry
       containers:
         - name: todo-backend
           image: docker.io/iku1/todo_backend:4.6.0
