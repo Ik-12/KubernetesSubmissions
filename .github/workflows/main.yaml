@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - "**"
+    tags:
+      - "*"
+
   workflow_dispatch:
     inputs:
       force_ping_pong:
@@ -408,7 +411,7 @@ jobs:
           message: New version released ${{ github.sha }} for local deployment to staging
 
       - name: Deploy to production if a tagged commit
-        if: steps.checktag.outputs.is_tagged == 'true'
+        if: steps.checktag.outputs.is_tagged == 'true' || github.ref_type == 'tag'
         uses: EndBug/add-and-commit@v9
         with:
           new_branch: master-local-production
