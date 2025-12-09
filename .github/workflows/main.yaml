@@ -157,7 +157,7 @@ jobs:
 
   build-publish-deploy-log-output:
     name: Build, Publish and Deploy Log Output App
-    needs: detect-changes
+    needs: [detect-changes, build-publish-deploy-ping-pong]
     if: needs.detect-changes.outputs.log-output == 'true' || ${{ github.event.inputs.force_log_output != 'true' }}
     environment: GKE
     runs-on: ubuntu-latest
