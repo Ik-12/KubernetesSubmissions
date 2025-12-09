@@ -412,11 +412,17 @@ jobs:
 
       - name: Deploy to production if a tagged commit
         if: steps.checktag.outputs.is_tagged == 'true' || github.ref_type == 'tag'
+        working-directory: the_project/
+        run: |
+          touch production.txt
+
+      - name: Deploy to production if a tagged commit
+        if: steps.checktag.outputs.is_tagged == 'true' || github.ref_type == 'tag'
         uses: EndBug/add-and-commit@v9
         with:
           new_branch: master-local-production
           push: 'origin master-local-production --set-upstream --force'
-          commit: '--allow-empty'
+          add: './the_project/production.txt'
           message: New version released ${{ github.sha }} for local deployment to production
 
       - name: Deploy to GKE if cluster is running
