@@ -1,4 +1,12 @@
-# Exercise 4.7
+# Exercise 4.9
+
+## GitOps Enhancement
+
+Separate environments for production and staging are implemented using different branches:
+ - `master-local-staging`: changes are pushed to this branch for every commit and Argo CD watches it for updates
+ - `master-local-deployment`: this branch is updated only for tagged commits
+
+ The environments don't use `namePrefix` because they are already in separate namespaces and this also ensures that the environments are identical. This helps to minimize probability of bugs caused by e.g. static references to staging- resources.
 
 ## GitOps deployment strategy
 

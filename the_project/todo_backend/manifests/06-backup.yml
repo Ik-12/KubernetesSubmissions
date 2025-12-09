@@ -4,15 +4,16 @@ metadata:
   name: add-todo-db-backup-cronjob
   namespace: project
 spec:
-  schedule: "0 4 * * *" # 04:00 AM
+  schedule: "*/2 * * * *" # 04:00 AM
   jobTemplate:
     spec:
       template:
         spec:
-          # Kubernetes Service Account is bind to this Google Service Account.
+          # Kubernetes Service Account is bind to this Google Service Account when running on GKE.
           # This allows the Pod running with postgres-backup-sa to act as postgres-backup-gsa
-          # and thus eliminates need of using storing keys in sectres and mounting them
+          # and thus eliminates need of using storing keys in secrets and mounting them
           # to the container which would be both cumbersome and not very secure.
+          # On local deployments, the key is mounted using a patch file.
           serviceAccountName: postgres-backup-sa
           containers:
             - name: todo-backend-backup-cron
@@ -34,6 +35,12 @@ spec:
                 - /bin/sh
                 - -c
                 - |
+                  # Login using key if not running on GKE with Workload Identity
+                  if [ -f /var/secrets/google/key.json ]; then
+                    gcloud auth activate-service-account --key-file=/var/secrets/google/key.json
+                  fi
+
+                  # gcloud auth activate-service-account --key-file=/var/secrets/google/key.json
                   # Install Postgres client. Note: the version must match the server version
                   # so we can't use package provided by debian.
                   apt-get update 

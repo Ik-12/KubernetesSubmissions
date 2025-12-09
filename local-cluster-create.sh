@@ -32,3 +32,7 @@ for ns in $namespaces; do
        --docker-email=ikujamaki@gmail.com -n $ns
 done
 
+# Backups are created only in production namespace
+kubectl create secret generic backup-gcp-service-account-key \
+  --from-file=key.json=$HOME/.secrets/todo-db-backup-sa-key.json \
+  -n production

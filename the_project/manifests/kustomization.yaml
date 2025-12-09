@@ -18,3 +18,14 @@ resources:
   # Frontend
   - ../todo_app/manifests/deployment.yaml
   - ../todo_app/manifests/service.yaml
+
+# Add Service Account key when deoloyed locally
+patches:
+  - path: add-gcp-sa-key-patch.yaml
+    target:
+      kind: CronJob
+      name: add-todo-db-backup-cronjob
+  - path: delete-service-account-ref.yaml
+    target:
+      kind: CronJob
+      name: add-todo-db-backup-cronjob
