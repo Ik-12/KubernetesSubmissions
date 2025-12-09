@@ -395,10 +395,9 @@ jobs:
           message: New version released ${{ github.sha }} to GKE
 
       - name: Update Local cluster kustomization.yaml for staging with new image tag
-        working-directory: the_project/
+        working-directory: the_project/manifests/
         run: |
           # Use the images we just build and pushed
-          # kustomize edit set namespace staging
           kustomize edit set image \*/todo_app:\*=$TODO_APP_IMAGE_TAG
           kustomize edit set image \*/todo_backend:\*=$TODO_BACKEND_IMAGE_TAG
           kustomize edit set image \*/todo_broadcaster:\*=$TODO_BROADCASTER_IMAGE_TAG
@@ -408,7 +407,7 @@ jobs:
         with:
           new_branch: master-local-staging
           push: 'origin master-local-staging --set-upstream --force'
-          add: './the_project/kustomization.yaml'
+          add: './the_project/manifests/kustomization.yaml'
           message: New version released ${{ github.sha }} for local deployment to staging
 
       - name: Deploy to production if a tagged commit
