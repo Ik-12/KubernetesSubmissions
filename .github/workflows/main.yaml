@@ -275,7 +275,7 @@ jobs:
   build-publish-deploy-the-project:
     name: Build, Publish and Deploy The Project
     needs: detect-changes
-    if: needs.detect-changes.outputs.the-project == 'true' || ${{ github.event.inputs.force_the_project != 'true' }}
+    if: needs.detect-changes.outputs.the-project == 'true' || ${{ github.event.inputs.force_the_project != 'true' }} || github.ref_type == 'tag'
     environment: GKE
     runs-on: ubuntu-latest
 
