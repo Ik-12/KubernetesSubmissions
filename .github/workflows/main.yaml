@@ -415,7 +415,7 @@ jobs:
         if: steps.checktag.outputs.is_tagged == 'true' || github.ref_type == 'tag'
         working-directory: the_project/
         run: |
-          touch production.txt
+          date > production.txt
 
       - name: Deploy to production if a tagged commit
         if: steps.checktag.outputs.is_tagged == 'true' || github.ref_type == 'tag'
