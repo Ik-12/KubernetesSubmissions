@@ -16,6 +16,7 @@ logging.basicConfig(level=logging.DEBUG)
 class Broadcaster:
     def __init__(self):        
         self.nats_conn = None
+        self.is_production = self.get_namespace() == "production"
 
         if APPRISE_URL != "":
             self.notifier = apprise.Apprise()
@@ -23,6 +24,13 @@ class Broadcaster:
             logger.info(f"Notifications to {APPRISE_URL:.32}... enabled.")
         else:
             logger.error("Environment variable APPRISE_URL not set, notification disable.")
+
+    def get_namespace():
+        try:
+            with open("/var/run/secrets/kubernetes.io/serviceaccount/namespace", "r") as f:
+                return f.read().strip()
+        except FileNotFoundError:
+            return ""  # Not running in Kubernetes
 
     async def init_nats(self):
         logger.info(f"Connecting to NATS server at {NATS_URL}...")
@@ -37,7 +45,8 @@ class Broadcaster:
             logger.debug("Received a message on '{subject} {reply}': {data}".format(
                 subject=subject, reply=reply, data=data))
 
-            self.notifier.notify(body=data, title='A todo item changed')
+            if self.is_production and hasattr(self, 'notifier'):
+                self.notifier.notify(body=data, title='A todo item changed')
 
         # Use a queue to allow multiple broadcaster instance
         # that send the notification only once
