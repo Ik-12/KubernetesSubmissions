@@ -25,7 +25,7 @@ class Broadcaster:
         else:
             logger.error("Environment variable APPRISE_URL not set, notification disable.")
 
-    def get_namespace():
+    def get_namespace(self):
         try:
             with open("/var/run/secrets/kubernetes.io/serviceaccount/namespace", "r") as f:
                 return f.read().strip()
