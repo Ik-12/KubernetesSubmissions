@@ -5,7 +5,7 @@
 To allow loading of shared resources from parent directories apply following manifest:
 
 ```
-k apply -f argo-cm-config.yml
+kubectl apply -f argo-cm-config.yaml
 ```
 
 ```
