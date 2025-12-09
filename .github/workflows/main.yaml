@@ -280,6 +280,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Check if commit has an exact tag
+        id: checktag
+        run: |
+          if git describe --exact-match --tags >/dev/null 2>&1; then
+            echo "is_tagged=true" >> $GITHUB_OUTPUT
+          else
+            echo "is_tagged=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: Set Kubernetes namespace to use
         run: |
           if [ "$BRANCH" = "master" ]; then
@@ -397,14 +406,8 @@ jobs:
           add: './the_project/kustomization.yaml'
           message: New version released ${{ github.sha }} for local deployment to staging
 
-      # - name: Deploy to production if tagged commit
-      #   if: github.ref_type == 'tag'
-      #   working-directory: the_project/manifests
-      #   run: |
-      #     kustomize edit set namespace production
-
-      - name: Deploy to production if tagged commit
-        if: github.ref_type == 'tag'
+      - name: Deploy to production if a tagged commit
+        if: steps.checktag.outputs.is_tagged == 'true'
         uses: EndBug/add-and-commit@v9
         with:
           new_branch: master-local-production
