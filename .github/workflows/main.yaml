@@ -403,7 +403,7 @@ jobs:
         uses: EndBug/add-and-commit@v9
         with:
           new_branch: master-local-staging
-          push: 'origin main-local-staging --set-upstream --force'
+          push: 'origin master-local-staging --set-upstream --force'
           add: './the_project/kustomization.yaml'
           message: New version released ${{ github.sha }} for local deployment to staging
 
@@ -412,7 +412,7 @@ jobs:
         uses: EndBug/add-and-commit@v9
         with:
           new_branch: master-local-production
-          push: 'origin main-local-production --set-upstream --force'
+          push: 'origin master-local-production --set-upstream --force'
           commit: '--allow-empty'
           message: New version released ${{ github.sha }} for local deployment to production
 
