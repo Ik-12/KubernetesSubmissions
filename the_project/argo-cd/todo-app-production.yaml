@@ -1,17 +1,17 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: todo-app-staging
+  name: todo-app-production
   namespace: argocd
 spec:
   project: default
   source:
     repoURL: https://github.com/Ik-12/KubernetesSubmissions.git
-    path: the_project/overlays/staging
-    targetRevision: master-local-staging
+    path: the_project/overlays/production
+    targetRevision: master-local-production
   destination:
     server: https://kubernetes.default.svc
-    namespace: staging
+    namespace: production
   syncPolicy:
     automated:
       enabled: true
