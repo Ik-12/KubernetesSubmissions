@@ -1,0 +1,16 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: greeter-ingress
+  namespace: exercises
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /greeter
+        pathType: Prefix
+        backend:
+          service:
+            name: greeter-svc
+            port:
+              number: 80
