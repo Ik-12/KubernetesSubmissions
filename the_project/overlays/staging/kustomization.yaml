@@ -39,10 +39,10 @@ patches:
 images:
 - name: '*/todo_app:*'
   newName: europe-north1-docker.pkg.dev/dwk-gke-iku/dwk-artifact-repo/todo_app
-  newTag: master-c81c6de18392fb1dac16776fd6ab99d864b66754
+  newTag: todo-app-0.91-c81c6de18392fb1dac16776fd6ab99d864b66754
 - name: '*/todo_backend:*'
   newName: europe-north1-docker.pkg.dev/dwk-gke-iku/dwk-artifact-repo/todo_backend
-  newTag: master-c81c6de18392fb1dac16776fd6ab99d864b66754
+  newTag: todo-app-0.91-c81c6de18392fb1dac16776fd6ab99d864b66754
 - name: '*/todo_broadcaster:*'
   newName: europe-north1-docker.pkg.dev/dwk-gke-iku/dwk-artifact-repo/todo_broadcaster
-  newTag: master-c81c6de18392fb1dac16776fd6ab99d864b66754
+  newTag: todo-app-0.91-c81c6de18392fb1dac16776fd6ab99d864b66754
