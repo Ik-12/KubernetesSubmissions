@@ -1,4 +1,4 @@
-name: Release the Project
+name: Main CI/CD Pipeline
 
 on:
   push:
@@ -272,8 +272,8 @@ jobs:
           kustomize --load-restrictor LoadRestrictionsNone build . | kubectl apply -f -
           kubectl get services -o wide
 
-  build-publish-deploy-the-project:
-    name: Build, Publish and Deploy The Project
+  deploy-the-project:
+    name: Deploy The Project
     needs: detect-changes
     if: needs.detect-changes.outputs.the-project == 'true' || ${{ github.event.inputs.force_the_project != 'true' }} || github.ref_type == 'tag'
     environment: GKE
@@ -334,80 +334,23 @@ jobs:
           project_id: "${{ env.PROJECT_ID }}"
           location: "${{ env.GKE_ZONE }}"
 
-      - name: "Form the todo-app image name"
-        run: echo "TODO_APP_IMAGE_TAG=$REGISTRY/$PROJECT_ID/$REPOSITORY/todo_app:$BRANCH-$GITHUB_SHA" >> $GITHUB_ENV
-
-      - name: Build and push todo-app image
-        if: ${{ !env.ACT_SKIP_BUILD }}
-        uses: docker/build-push-action@v4
-        with:
-          context: ./the_project/todo_app
-          push: true
-          tags: ${{ env.TODO_APP_IMAGE_TAG }}
-
-      - name: "Form the todo-backend image name"
-        run: echo "TODO_BACKEND_IMAGE_TAG=$REGISTRY/$PROJECT_ID/$REPOSITORY/todo_backend:$BRANCH-$GITHUB_SHA" >> $GITHUB_ENV
-
-      - name: Build and push todo-backend image
-        if: ${{ !env.ACT_SKIP_BUILD }}
-        uses: docker/build-push-action@v4
-        with:
-          context: ./the_project/todo_backend
-          push: true
-          tags: ${{ env.TODO_BACKEND_IMAGE_TAG }}
-
-      - name: "Form the todo-broadcaster image name"
-        run: echo "TODO_BROADCASTER_IMAGE_TAG=$REGISTRY/$PROJECT_ID/$REPOSITORY/todo_broadcaster:$BRANCH-$GITHUB_SHA" >> $GITHUB_ENV
-
-      - name: Build and push todo-broadcaster image
-        if: ${{ !env.ACT_SKIP_BUILD }}
-        uses: docker/build-push-action@v4
-        with:
-          context: ./the_project/todo_broadcaster
-          push: true
-          tags: ${{ env.TODO_BROADCASTER_IMAGE_TAG }}
-
-      - name: Install kubectl CLI
-        uses: azure/setup-kubectl@v4
-        with:
-          version: "latest"
-
       - name: Set up Kustomize
         uses: imranismail/setup-kustomize@v2.1.0
         with:
           # Need to make local runner using act to work
           github-token: "${{ secrets.GITHUB_TOKEN }}"
 
-      - name: Update GKE kustomization.yaml with new image tag
-        working-directory: the_project/gke/manifests
+      - name: Deploy to staging
+        working-directory: the_project/
         run: |
-          # Use the images we just build and pushed
-          kustomize edit set image \*/todo_app:\*=$TODO_APP_IMAGE_TAG
-          kustomize edit set image \*/todo_backend:\*=$TODO_BACKEND_IMAGE_TAG
-          kustomize edit set image \*/todo_broadcaster:\*=$TODO_BROADCASTER_IMAGE_TAG
-
-      - name: Commit GKE kustomization.yaml to GitHub
-        uses: EndBug/add-and-commit@v9
-        with:
-          new_branch: main-gke-deploy
-          push: 'origin main-gke-deploy --set-upstream --force'
-          add: './the_project/gke/manifests/kustomization.yaml'
-          message: New version released ${{ github.sha }} to GKE
-
-      - name: Update Local cluster kustomization.yaml for staging with new image tag
-        working-directory: the_project/manifests/
-        run: |
-          # Use the images we just build and pushed
-          kustomize edit set image \*/todo_app:\*=$TODO_APP_IMAGE_TAG
-          kustomize edit set image \*/todo_backend:\*=$TODO_BACKEND_IMAGE_TAG
-          kustomize edit set image \*/todo_broadcaster:\*=$TODO_BROADCASTER_IMAGE_TAG
+          date > staging.txt
 
       - name: Commit local kustomization.yaml to GitHub
         uses: EndBug/add-and-commit@v9
         with:
           new_branch: master-local-staging
           push: 'origin master-local-staging --set-upstream --force'
-          add: './the_project/manifests/kustomization.yaml'
+          add: './the_project/staging.txt'
           message: New version released ${{ github.sha }} for local deployment to staging
 
       - name: Deploy to production if a tagged commit
