@@ -4,7 +4,7 @@ metadata:
   name: add-todo-db-backup-cronjob
   namespace: project
 spec:
-  schedule: "*/2 * * * *" # 04:00 AM
+  schedule: "0 4 * * *" # 04:00 AM
   jobTemplate:
     spec:
       template:
