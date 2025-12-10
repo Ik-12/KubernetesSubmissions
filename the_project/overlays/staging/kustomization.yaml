@@ -5,34 +5,44 @@ resources:
 - ./../../manifests/
 namespace: staging
 
-patches:
   # Don't deploy the backup CronJob in staging
-  - target:
-      kind: CronJob
-      name: add-todo-db-backup-cronjob
-    patch: |
-      $patch: delete
-      apiVersion: batch/v1
-      kind: CronJob
-      metadata:
-        name: add-todo-db-backup-cronjob
   # Use separate StorageClass for image-cache PVC in staging
-  - target:
-      kind: PersistentVolume
+patches:
+- patch: |
+    $patch: delete
+    apiVersion: batch/v1
+    kind: CronJob
+    metadata:
+      name: add-todo-db-backup-cronjob
+  target:
+    kind: CronJob
+    name: add-todo-db-backup-cronjob
+- patch: |
+    $patch: delete
+    apiVersion: v1
+    kind: PersistentVolume
+    metadata:
       name: image-cache-vol
-    patch: |
-      $patch: delete
-      apiVersion: v1
-      kind: PersistentVolume
-      metadata:
-        name: image-cache-vol
-  - target:
-      kind: PersistentVolumeClaim
+  target:
+    kind: PersistentVolume
+    name: image-cache-vol
+- patch: |
+    apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
       name: image-cache
-    patch: |
-      apiVersion: v1
-      kind: PersistentVolumeClaim
-      metadata:
-        name: image-cache
-      spec:
-        storageClassName: staging-image-cache-vol
+    spec:
+      storageClassName: staging-image-cache-vol
+  target:
+    kind: PersistentVolumeClaim
+    name: image-cache
+images:
+- name: '*/todo_app:*'
+  newName: europe-north1-docker.pkg.dev/dwk-gke-iku/dwk-artifact-repo/todo_app
+  newTag: master-a9865c27317fc8c62e5dbb4750333b2565041b35
+- name: '*/todo_backend:*'
+  newName: europe-north1-docker.pkg.dev/dwk-gke-iku/dwk-artifact-repo/todo_backend
+  newTag: master-a9865c27317fc8c62e5dbb4750333b2565041b35
+- name: '*/todo_broadcaster:*'
+  newName: europe-north1-docker.pkg.dev/dwk-gke-iku/dwk-artifact-repo/todo_broadcaster
+  newTag: master-a9865c27317fc8c62e5dbb4750333b2565041b35
