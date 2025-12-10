@@ -5,24 +5,34 @@ resources:
 - ./../../manifests/
 namespace: production
 
-patches:
   # Use separate StorageClass for image-cache PVC in staging
-  - target:
-      kind: PersistentVolume
+patches:
+- patch: |
+    $patch: delete
+    apiVersion: v1
+    kind: PersistentVolume
+    metadata:
       name: image-cache-vol
-    patch: |
-      $patch: delete
-      apiVersion: v1
-      kind: PersistentVolume
-      metadata:
-        name: image-cache-vol
-  - target:
-      kind: PersistentVolumeClaim
+  target:
+    kind: PersistentVolume
+    name: image-cache-vol
+- patch: |
+    apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
       name: image-cache
-    patch: |
-      apiVersion: v1
-      kind: PersistentVolumeClaim
-      metadata:
-        name: image-cache
-      spec:
-        storageClassName: production-image-cache-vol
+    spec:
+      storageClassName: production-image-cache-vol
+  target:
+    kind: PersistentVolumeClaim
+    name: image-cache
+images:
+- name: '*/todo_app:*'
+  newName: europe-north1-docker.pkg.dev/dwk-gke-iku/dwk-artifact-repo/todo_app
+  newTag: 4.10-f8b796f26780a499ef53ceecc967b1ad0e84ec46
+- name: '*/todo_backend:*'
+  newName: europe-north1-docker.pkg.dev/dwk-gke-iku/dwk-artifact-repo/todo_backend
+  newTag: 4.10-f8b796f26780a499ef53ceecc967b1ad0e84ec46
+- name: '*/todo_broadcaster:*'
+  newName: europe-north1-docker.pkg.dev/dwk-gke-iku/dwk-artifact-repo/todo_broadcaster
+  newTag: 4.10-f8b796f26780a499ef53ceecc967b1ad0e84ec46
