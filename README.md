@@ -65,3 +65,4 @@
 - [5.3](https://github.com/Ik-12/KubernetesSubmissions/tree/5.3/log_output)
 - [5.4](https://github.com/Ik-12/KubernetesSubmissions/tree/5.4/wikipedia-sidecar)
 - [5.6](https://github.com/Ik-12/KubernetesSubmissions/tree/5.6/serverless)
+- [5.7](https://github.com/Ik-12/KubernetesSubmissions/tree/5.7/ping_pong)
