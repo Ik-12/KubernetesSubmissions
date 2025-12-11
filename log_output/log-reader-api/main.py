@@ -57,10 +57,7 @@ def get_log_string():
     resp = resp + f"env variable: MESSAGE={os.getenv('MESSAGE')}" + "\n"
 
     if os.path.exists(INFO_FILE_PATH):
-        resp = resp 
-        + "file content:"
-        + open(INFO_FILE_PATH, "r").read()
-        + "\n"
+        resp = resp + "file content:" + open(INFO_FILE_PATH, "r").read() + "\n"
     else:
         resp = resp + f"Info file {INFO_FILE_PATH} does not exist.\n" 
 
