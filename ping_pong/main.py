@@ -35,7 +35,7 @@ class PingPongApp:
         return conn
 
     def get_pong_count(self):
-        if self.conn is None:
+        if self.conn is None or self.conn.closed:
             self.conn = self.init_db()
 
         with self.conn.cursor() as cur:
@@ -44,6 +44,9 @@ class PingPongApp:
             return row[0] if row else 0
 
     def increment_pong_count(self):
+        if self.conn is None or self.conn.closed:
+            self.conn = self.init_db()
+        
         with self.conn.cursor() as cur:
             cur.execute(
                 "UPDATE pong_counter SET pong_count = pong_count + 1 WHERE id=1;"
@@ -65,7 +68,7 @@ class PingPongApp:
 
         @self.flask_app.route("/ready")
         def ready():
-            if self.conn is None:
+            if self.conn is None or self.conn.closed:
                 self.conn = self.init_db()
 
             if self.conn is not None:
