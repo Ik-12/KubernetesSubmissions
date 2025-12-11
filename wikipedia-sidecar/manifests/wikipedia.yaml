@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wikipedia
+  namespace: exercises
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: wikipedia
+  template:
+    metadata:
+      labels:
+        app: wikipedia
+    spec:
+      volumes:
+      - name: wikipedia-data
+        emptyDir: {}
+      initContainers:
+      # Init container to fetch the Wikipedia main page
+      - name: wikipedia-init
+        image: curlimages/curl:8.17.0
+        command: ['sh', '-c', 'curl -o /wikipedia/index.html https://en.wikipedia.org/wiki/Kubernetes']
+        volumeMounts:
+        - name: wikipedia-data
+          mountPath: /wikipedia
+      # Sidecar container to periodically fetch a random Wikipedia page
+      - name: wikipedia-random
+        image: curlimages/curl:8.17.0
+        restartPolicy: Always
+        command: ['sh', '-c', 'while true; do sleep $(( 5*60 + $RANDOM % 600 )); curl -L -o /wikipedia/index.html https://en.wikipedia.org/wiki/Special:Random ; done']
+        volumeMounts:
+        - name: wikipedia-data
+          mountPath: /wikipedia
+      containers:
+        - name: wikipedia-nginx
+          image: nginx:1.29.4
+          volumeMounts:
+          - name: wikipedia-data
+            mountPath: /usr/share/nginx/html
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: wikipedia-svc
+  namespace: exercises
+spec:
+  type: ClusterIP
+  selector:
+    app: wikipedia
+  ports:
+    - port: 80
+      protocol: TCP
+      targetPort: 80
+
