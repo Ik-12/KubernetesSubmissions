@@ -1,4 +1,44 @@
-# Exercise 4.7
+# Exercise 5.7
+
+## Serverless Ping-pong
+
+Serverless applications must be stateless so it makes sense only to transform the frontend. The Postgres DB is still used to keep track of the application state, i.e. ping count.
+
+1. Deploy the serverless configuration:
+
+```
+k apply -f serverless/ping-pong-frontend.yaml
+```
+
+2. Verify the running serverless services:
+
+```
+$ kn service list
+NAME                   URL                                                           LATEST                       AGE   CONDITIONS   READY   REASON
+hello                  http://hello.exercises.192.168.97.2.sslip.io                  hello-00002                  39m   3 OK / 3     True
+serverless-ping-pong   http://serverless-ping-pong.exercises.192.168.97.2.sslip.io   serverless-ping-pong-00001   95s   3 OK / 3     True
+```
+
+3. Verify that the serverless version works: 
+
+```
+$ curl http://serverless-ping-pong.exercises.192.168.97.2.sslip.io
+pong 336
+```
+
+Containers are created and terminated as expected:
+```
+$ kubectl get pod -l serving.knative.dev/service=serverless-ping-pong -w
+NAME                                                     READY   STATUS        RESTARTS   AGE
+serverless-ping-pong-00001-deployment-666bcddff5-dm5xw   1/2     Terminating   0          5m44s
+serverless-ping-pong-00001-deployment-666bcddff5-hdl9r   1/2     Terminating   0          3m54s
+serverless-ping-pong-00001-deployment-666bcddff5-2stnr   0/2     Pending       0          0s
+serverless-ping-pong-00001-deployment-666bcddff5-2stnr   0/2     Pending       0          0s
+serverless-ping-pong-00001-deployment-666bcddff5-2stnr   0/2     ContainerCreating   0          1s
+serverless-ping-pong-00001-deployment-666bcddff5-2stnr   0/2     ContainerCreating   0          1s
+serverless-ping-pong-00001-deployment-666bcddff5-2stnr   1/2     Running             0          9s
+serverless-ping-pong-00001-deployment-666bcddff5-2stnr   2/2     Running             0          9s
+```
 
 ## GitOps deployment strategy
 

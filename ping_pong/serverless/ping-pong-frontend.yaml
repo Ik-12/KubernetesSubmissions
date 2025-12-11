@@ -1,0 +1,17 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: serverless-ping-pong
+  namespace: exercises
+spec:
+  template:
+    spec:
+      containers:
+      - name: ping-pong
+        image: docker.io/iku1/ping_pong:5.3.0
+        imagePullPolicy: Always
+        ports:
+          - containerPort: 5001
+        env:
+          - name: POSTGRES_URL
+            value: "postgresql://postgres@postgres-svc"
