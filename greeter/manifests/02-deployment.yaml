@@ -1,17 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: greeter-deployment
+  name: greeter-deployment-v1
   namespace: exercises
+  labels:
+    app: greeter
+    version: v1
 spec:
   replicas: 1
   selector:
     matchLabels:
       app: greeter
+      version: v1
   template:
     metadata:
       labels:
         app: greeter
+        version: v1
     spec:
       securityContext:
         runAsUser: 999
@@ -24,6 +29,50 @@ spec:
           image: docker.io/iku1/greeter:5.3.0
           imagePullPolicy: Always
           env:
+            - name: MESSAGE
+              value: "Hello from Greeter v1!"
+            - name: PORT
+              value: "5008"
+          readinessProbe:
+            initialDelaySeconds: 10
+            periodSeconds: 60
+            httpGet:
+              path: /
+              port: 5008
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: greeter-deployment-v2
+  namespace: exercises
+  labels:
+    app: greeter
+    version: v2
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: greeter
+      version: v2
+  template:
+    metadata:
+      labels:
+        app: greeter
+        version: v2
+    spec:
+      securityContext:
+        runAsUser: 999
+        runAsGroup: 999
+        fsGroup: 999
+      imagePullSecrets:
+      - name: gcp-artifact-registry
+      containers:
+        - name: greeter
+          image: docker.io/iku1/greeter:5.3.0
+          imagePullPolicy: Always
+          env:
+            - name: MESSAGE
+              value: "Hello from Greeter v2!"
             - name: PORT
               value: "5008"
           readinessProbe:

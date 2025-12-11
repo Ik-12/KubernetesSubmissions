@@ -18,6 +18,33 @@ kubectl annotate gateway log-output-gateway networking.istio.io/service-type=Clu
 kubectl port-forward svc/log-output-gateway-istio 6000:80
 ```
 
+### Traffic routing
+
+1. Create a waypoint proxy with `istioctl waypoint apply --enroll-namespace --wait`
+2. Apply the services and routing:
+
+```
+k apply -f greeter/manifests/02-deployment.yaml
+k apply -f greeter/manifests/03-service.yaml
+k apply -f log_output/manifests/istio-greeter-routing.yaml
+```
+
+Generate some traffic and log responses:
+
+```
+for i in $(seq 1 100); do curl -s localhost:6000/log | grep greetings: >> curl.log ; done
+```
+
+Ensure that routing works:
+
+```
+$ sort curl.log | uniq -c
+ 90 greetings: Hello from Greeter v1!
+ 10 greetings: Hello from Greeter v2!
+```
+
+Looks ok! (on Kiali too)
+
 ## GitOps deployment strategy
 
 In earlier exercises, we already used GitHub actions to automatically deploy the apps to GKE. Thus, for this exercise it made most sense
