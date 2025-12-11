@@ -43,7 +43,7 @@ spec:
             - name: LOG_FILE_PATH
               value: "/tmp/log_output/random.log"
         - name: log-reader-api
-          image: docker.io/iku1/log_output_reader_api:4.1
+          image: docker.io/iku1/log_output_reader_api:5.3.1
           imagePullPolicy: Always
           volumeMounts:
           - name: shared-logs
@@ -59,6 +59,8 @@ spec:
               value: "/config/information.txt"
             - name: PONG_COUNT_SERVICE_URL
               value: "http://ping-pong-svc:80/pings"
+            - name: GREETER_URL
+              value: "http://greeter-svc:80/"
             - name: PORT
               value: "5000"
             - name: MESSAGE # ENV name passed to container

@@ -1,5 +1,10 @@
 # Create the cluster with proper ingress
-k3d cluster create -a 2 --k3s-arg "--tls-san=127.0.0.1@server:0" --port 8082:30080@agent:0 -p 8081:80@loadbalancer
+if [ "$1" == "istio" ]; then
+    echo "Creating k3d cluster with Istio (trafeik disabled)..."
+    k3d cluster create --api-port 6550 -p '9080:80@loadbalancer' -p '9443:443@loadbalancer' --agents 2 --k3s-arg '--disable=traefik@server:*'
+else
+    k3d cluster create -a 2 --k3s-arg "--tls-san=127.0.0.1@server:0" --port 8082:30080@agent:0 -p 8081:80@loadbalancer
+fi
 
 # Create dir for persitent storage
 docker exec k3d-k3s-default-agent-0 mkdir -p /tmp/kube

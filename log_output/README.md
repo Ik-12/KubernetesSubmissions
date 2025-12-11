@@ -1,4 +1,22 @@
-# Exercise 4.7
+# Exercise 5.3 
+
+## Service Mesh
+
+To create a service mesh for log output app:
+
+1. Setup istio as in Exercise 5.2
+2. Create gateway for istio and set it to use ClusterIP:
+
+```
+k apply -f log_output/manifests/istio-gateway.yaml
+kubectl annotate gateway log-output-gateway networking.istio.io/service-type=ClusterIP --namespace=exercises
+```
+
+3. Access the gateway from outside using port forward:
+
+```
+kubectl port-forward svc/log-output-gateway-istio 6000:80
+```
 
 ## GitOps deployment strategy
 
